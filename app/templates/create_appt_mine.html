@@ -1,0 +1,44 @@
+{% extends "manager_base.html" %}
+
+{% block content %}
+	<h1>Add Appointment</h1>
+	<form action="" method="post" novalidate>
+		{{ create_form.hidden_tag() }}
+		<p>
+			{{ create_form.client_first.label }}
+			{{ create_form.client_first(size=32) }}
+			{% for error in create_form.client_first.errors %}
+			<span style="color:red;">[{{ error }}]</span>
+			{% endfor %}
+		</p>
+		<p>
+			{{ create_form.client_last.label }}
+			{{ create_form.client_last(size=32) }}
+			{% for error in create_form.client_last.errors %}
+			<span style="color:red;">[{{ error }}]</span>
+			{% endfor %}
+		</p>
+		<p>
+			{{ create_form.date.label }}
+			{{ create_form.date(size=32) }}
+			{% for error in create_form.date.errors %}
+			<span style="color:red;">[{{ error }}]</span>
+			{% endfor %}
+		</p>
+		<p>
+			{{ create_form.time.label }}
+			{{ create_form.time(size=32) }}
+			{% for error in create_form.time.errors %}
+			<span style="color:red;">[{{ error }}]</span>
+			{% endfor %}
+		</p>
+		<p>
+			{{ create_form.notes.label }}
+			{{ create_form.notes(size=32) }}
+			{% for error in create_form.notes.errors %}
+			<span style="color:red;">[{{ error }}]</span>
+			{% endfor %}
+		</p>
+		<p>{{ create_form.create() }}</p>
+	</form>
+{% endblock %}

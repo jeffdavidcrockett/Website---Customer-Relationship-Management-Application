@@ -1,0 +1,46 @@
+{% extends "manager_base.html" %}
+
+{% block content %}
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Welcome!</title>
+</head>
+<body>
+	<form action="" method="post" novalidate>
+		{{ client_form.hidden_tag() }}
+		<p>
+			{{ client_form.first_name.label }}
+			{{ client_form.first_name(size=32) }}
+			{% for error in client_form.first_name.errors %}
+			<span style="color:red;">[{{ error }}]</span>
+			{% endfor %}
+		</p>
+		<p>
+			{{ client_form.last_name.label }}
+			{{ client_form.last_name(size=32) }}
+			{% for error in client_form.last_name.errors %}
+			<span style="color:red;">[{{ error }}]</span>
+			{% endfor %}
+		</p>
+		<p>
+			{{ client_form.phone.label }}
+			{{ client_form.phone(size=32) }}
+			{% for error in client_form.phone.errors %}
+			<span style="color:red;">[{{ error }}]</span>
+			{% endfor %}
+		</p>
+		<p>
+			{{ client_form.email.label }}
+			{{ client_form.email(size=32) }}
+			{% for error in client_form.email.errors %}
+			<span style="color:red;">[{{ error }}]</span>
+			{% endfor %}
+		</p>
+		<p>{{ client_form.credit_score.label }} {{ client_form.credit_score }}</p>
+		<p>{{ client_form.desired_funding.label }} {{ client_form.desired_funding }}</p>
+		<p>{{ client_form.submit() }}</p>
+	</form>
+</body>
+</html>
+{% endblock %}

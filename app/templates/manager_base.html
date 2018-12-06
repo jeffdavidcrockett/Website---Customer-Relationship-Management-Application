@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Sign In</title>
+</head>
+<body>
+	<div>
+		<a href="{{ url_for('manager') }}">Home</a>
+		<a href="{{ url_for('create_appt') }}">Create Appointment</a>
+		<a href="{{ url_for('search_appt') }}">Search Appointments</a>
+		{% if current_user.is_anonymous %}
+		<a href="{{ url_for('login') }}">Login</a>
+		{% else %}
+		<a href="{{ url_for('logout') }}">Logout</a>
+		{% endif %}
+	</div>
+	<hr>
+	{% with messages = get_flashed_messages() %}
+	{% if messages %}
+	<ul>
+		{% for message in messages %}
+		<li>{{ message }}</li>
+		{% endfor %}
+	</ul>
+	{% endif %}
+	{% endwith %}
+	{% block content %}{% endblock %}
+</body>
+</html>
