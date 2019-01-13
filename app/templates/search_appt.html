@@ -5,7 +5,7 @@
 	<link rel="icon" type="image/png" href="static/img/admin/favicon.ico">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 
-	<title>Light Bootstrap Dashboard by Creative Tim</title>
+	<title>JMR Funding</title>
 
 	<meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport' />
     <meta name="viewport" content="width=device-width" />
@@ -29,6 +29,8 @@
     <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
     <link href='http://fonts.googleapis.com/css?family=Roboto:400,700,300' rel='stylesheet' type='text/css'>
     <link href="static/css/admin/pe-icon-7-stroke.css" rel="stylesheet" />
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    
 </head>
 <body>
 
@@ -65,15 +67,15 @@
                     </a>
                 </li>
                 <li>
-                    <a href="maps.html">
+                    <a href="{{ url_for('send_agreement') }}">
                         <i class="pe-7s-map-marker"></i>
-                        <p>Maps</p>
+                        <p>Send Agreement Email</p>
                     </a>
                 </li>
                 <li>
                     <a href="notifications.html">
                         <i class="pe-7s-bell"></i>
-                        <p>Notifications</p>
+                        <p>ReservedForFutureUse</p>
                     </a>
                 </li>
             </ul>
@@ -104,18 +106,18 @@
                               <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                                     <i class="fa fa-globe"></i>
                                     <b class="caret hidden-sm hidden-xs"></b>
-                                    <span class="notification hidden-sm hidden-xs">5</span>
+                                    <!-- <span class="notification hidden-sm hidden-xs">5</span> -->
 									<p class="hidden-lg hidden-md">
 										5 Notifications
 										<b class="caret"></b>
 									</p>
                               </a>
                               <ul class="dropdown-menu">
-                                <li><a href="#">Notification 1</a></li>
-                                <li><a href="#">Notification 2</a></li>
-                                <li><a href="#">Notification 3</a></li>
-                                <li><a href="#">Notification 4</a></li>
-                                <li><a href="#">Another notification</a></li>
+                                <li><a href="#">ReservedForFutureUse</a></li>
+                                <li><a href="#">ReservedForFutureUse</a></li>
+                                <li><a href="#">ReservedForFutureUse</a></li>
+                                <li><a href="#">ReservedForFutureUse</a></li>
+                                <li><a href="#">ReservedForFutureUse</a></li>
                               </ul>
                         </li>
                         <li>
@@ -140,10 +142,10 @@
                                 <li><a href="{{ url_for('my_appts') }}">My Appointments</a></li>
                                 <li><a href="{{ url_for('create_appt') }}">Create Appointment</a></li>
                                 <li><a href="#">Edit Appointments</a></li>
-                                <li><a href="#">Another action</a></li>
-                                <li><a href="#">Something</a></li>
                                 <li class="divider"></li>
-                                <li><a href="#">Separated link</a></li>
+                                <li><a href="#">ReservedForFutureUse</a></li>
+                                <li><a href="#">ReservedForFutureUse</a></li>
+                                <li><a href="#">ReservedForFutureUse</a></li>
                               </ul>
                         </li>
                         <li>
@@ -171,7 +173,7 @@
                 {% endif %}
                 {% endwith %}
             </span>
-            <form style='margin-left: 40px' action="" method="post" novalidate>
+            <form style="margin-left: 40px" action="" method="get" novalidate>
                 {{ form.hidden_tag() }}
                 <p>{{ form.search_by.label }} {{ form.search_by }}</p>
                 <p class="category">Date format: 2018-09-29</p>
@@ -188,7 +190,7 @@
 
         <div class="content">
             <div class="container-fluid">
-                <div class="row">
+                <div class="row" style="height: 700px; overflow: auto;">
                     <div class="col-md-12">
                         <div class="card">
                             <div class="header">
@@ -228,32 +230,7 @@
         <footer class="footer">
             <div class="container-fluid">
                 <nav class="pull-left">
-                    <ul>
-                        <li>
-                            <a href="#">
-                                Home
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#">
-                                Company
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#">
-                                Portfolio
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#">
-                               Blog
-                            </a>
-                        </li>
-                    </ul>
                 </nav>
-                <p class="copyright pull-right">
-                    &copy; <script>document.write(new Date().getFullYear())</script> <a href="http://www.creative-tim.com">Creative Tim</a>, made with love for a better web
-                </p>
             </div>
         </footer>
 

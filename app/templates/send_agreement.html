@@ -29,6 +29,31 @@
     <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
     <link href='http://fonts.googleapis.com/css?family=Roboto:400,700,300' rel='stylesheet' type='text/css'>
     <link href="static/css/admin/pe-icon-7-stroke.css" rel="stylesheet" />
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+    <script type="text/javascript">
+        $(function() {
+            var clientEmail = '{{ client[0].email }}';
+            if (clientEmail != "") {
+        $('#test').click(function() {
+            if (confirm("Are you sure you want to send a contract to " + clientEmail + "?") == true) {
+            $.ajax({
+                type: 'GET',
+                url: "/email_process",
+                data: {email: clientEmail},
+                dataType: "text",
+                contentType: 'application/json;charset=UTF-8',
+                success: function(data) {
+                    alert("Contract was sent to " + clientEmail);
+                }
+            });
+        }
+        });
+    }
+    });
+    </script>
+
 </head>
 <body>
 
@@ -52,7 +77,7 @@
                         <p>Dashboard</p>
                     </a>
                 </li>
-                <li  class="active">
+                <li >
                     <a href="{{ url_for('my_appts') }}">
                         <i class="pe-7s-user"></i>
                         <p>Appointments</p>
@@ -64,14 +89,14 @@
                         <p>Search Clients</p>
                     </a>
                 </li>
-                <li>
+                <li class="active">
                     <a href="{{ url_for('send_agreement') }}">
                         <i class="pe-7s-map-marker"></i>
                         <p>Send Agreement Email</p>
                     </a>
                 </li>
                 <li>
-                    <a href="notifications.html">
+                    <a href="#">
                         <i class="pe-7s-bell"></i>
                         <p>ReservedForFutureUse</p>
                     </a>
@@ -90,7 +115,7 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="#">Create Appointment</a>
+                    <a class="navbar-brand" href="#">Agreement Email</a>
                 </div>
                 <div class="collapse navbar-collapse">
                     <ul class="nav navbar-nav navbar-left">
@@ -127,6 +152,7 @@
                     </ul>
 
                     <ul class="nav navbar-nav navbar-right">
+                        
                         <li class="dropdown">
                               <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                                     <p>
@@ -136,9 +162,9 @@
 
                               </a>
                               <ul class="dropdown-menu">
-                                <li><a href="{{ url_for('my_appts') }}">My Appointments</a></li>
-                                <li><a href="{{ url_for('search_appt') }}">Search All Appointments</a></li>
-                                <li><a href="#">Edit Appointments</a></li>
+                                <li><a href="#">ReservedForFutureUse</a></li>
+                                <li><a href="#">ReservedForFutureUse</a></li>
+                                <li><a href="#">ReservedForFutureUse</a></li>
                                 <li class="divider"></li>
                                 <li><a href="#">ReservedForFutureUse</a></li>
                                 <li><a href="#">ReservedForFutureUse</a></li>
@@ -156,7 +182,6 @@
             </div>
         </nav>
 
-        <hr>
         {% with messages = get_flashed_messages() %}
         {% if messages %}
         <ul>
@@ -167,52 +192,45 @@
         {% endif %}
         {% endwith %}
 
-        <div class="content">
+        <div>
+            <h1>&nbsp;&nbsp;Send Agreement Email</h1><h3 id="result"></h3>
+            <form style='margin-left: 40px' action="" method="post" novalidate>
+                {{ search_form.hidden_tag() }}
+                <p>{{ search_form.id_in.label }} {{ search_form.id_in }}</p>
+                <p>{{ search_form.lookup() }}</p>
+            </form>
+        </div>
+
+        <div class="content" style="height: 500px; overflow: auto;">
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-md-12">
                         <div class="card">
                             <div class="header">
-                                <h4 class="title">Create Appointment</h4>
-                                <p class="category"></p><br>
-                                <form action="" method="post" novalidate>
-                                    {{ create_form.hidden_tag() }}
-                                    <p>
-                                        {{ create_form.client_id1.label }}<br>
-                                        {{ create_form.client_id1(size=10) }}
-                                        {% for error in create_form.client_id1.errors %}
-                                        <span style="color:red;">[{{ error }}]</span>
-                                        {% endfor %}
-                                    </p>
-                                    <p>
-                                        {{ create_form.client_id2.label }}<br>
-                                        {{ create_form.client_id2(size=10) }}
-                                        {% for error in create_form.client_id2.errors %}
-                                        <span style="color:red;">[{{ error }}]</span>
-                                        {% endfor %}
-                                    </p>
-                                    <p><br>
-                                        {{ create_form.year.label }} {{ create_form.year }} 
-                                        {{ create_form.month.label }} {{ create_form.month }} 
-                                        {{ create_form.day.label }} {{ create_form.day }}
-                                    </p>
-                                    <p><br>
-                                        {{ create_form.hour.label }} {{ create_form.hour }} 
-                                        {{ create_form.minute.label }} {{ create_form.minute }} 
-                                        {{ create_form.ampm.label }} {{ create_form.ampm }}
-                                    </p>
-                                    <p>
-                                        {{ create_form.notes.label }}<br>
-                                        {{ create_form.notes(size=64) }}
-                                        {% for error in create_form.notes.errors %}
-                                        <span style="color:red;">[{{ error }}]</span>
-                                        {% endfor %}
-                                    </p>
-                                    <p>{{ create_form.create() }}</p>
-                                </form>
+                                <h4 class="title">Appointment Results</h4>
                             </div>
                             <div class="content table-responsive table-full-width">
-                                
+                                <table class="table table-hover table-striped">
+                                    <thead>
+                                        <th>ID</th>
+                                    	<th>First</th>
+                                    	<th>Last</th>
+                                    	<th>Phone</th>
+                                    	<th>Email</th>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                        	<td>{{ client[0].id }}</td>
+                                        	<td>{{ client[0].first_name }}</td>
+                                        	<td>{{ client[0].last_name }}</td>
+                                        	<td>{{ client[0].phone }}</td>
+                                        	<td>{{ client[0].email }}</td>
+                                            <td>
+                                                <a href="#" id="test">Send Email</a>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
 
                             </div>
                         </div>
@@ -227,8 +245,6 @@
                 </nav>
             </div>
         </footer>
-
-
     </div>
 </div>
 

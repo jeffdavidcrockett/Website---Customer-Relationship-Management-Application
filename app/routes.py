@@ -1,20 +1,21 @@
-from flask import render_template, flash, redirect, url_for, request, json
-from app import app, db
+from flask import render_template, flash, redirect, url_for, request, jsonify
+from app import app, db, mail
 from app.forms import LoginForm, CreateAppointmentForm, SearchAppointmentForm, ClientForm, MessageInput, NoteInput, SearchClientForm, \
-MyAppointmentSearch, NewClientDisplayOptions
+MyAppointmentSearch, NewClientDisplayOptions, SendAgreementSearch, SendEmail
 from flask_login import current_user, login_user, login_required, logout_user
 from app.models import Marketer, Appointment, Memo, Note, Client
 from app.tables import SearchResults
 from werkzeug.urls import url_parse
 import datetime
 from sqlalchemy import desc
+from flask_mail import Message 
 
 
 @app.route('/test2', methods=['GET', 'POST'])
 def test2():
 	return render_template('test2.html')
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
 def index():
 	client_form = ClientForm()
@@ -58,10 +59,10 @@ def logout():
 @app.route('/manager', methods=['GET', 'POST'])
 @login_required
 def manager():
-	mssgs = db.session.query(Memo).order_by(Memo.id.desc()).limit(6)
-	notes = db.session.query(Note).order_by(Note.id.desc()).limit(6)
+	mssgs = db.session.query(Memo).order_by(Memo.id.desc()).limit(20)
+	notes = db.session.query(Note).order_by(Note.id.desc()).limit(20)
 	appts_query = Appointment.query.filter_by(date=str(datetime.date.today())).all()
-	results = db.session.query(Client).order_by(Client.id.desc()).filter_by(appointments=None).limit(7)
+	results = db.session.query(Client).order_by(Client.id.desc()).filter_by(appointments=None)
 	appts = len(appts_query)
 	mssg_in = MessageInput()
 	note_in = NoteInput()
@@ -152,7 +153,7 @@ def search_appt():
 
 	if form.validate_on_submit():
 		selection = form.search_by.data
-
+		
 		if selection == '1':
 			chars = '!@#$%^&*()_-+|\\}]{[;:/?.>,<`~='
 			state = True
@@ -183,7 +184,7 @@ def search_appt():
 @login_required
 def search_clients():
 	form = SearchClientForm()
-	client_results = db.session.query(Client).order_by(Client.id.desc()).limit(15)
+	client_results = db.session.query(Client).order_by(Client.id.desc()).limit(100)
 
 	if form.validate_on_submit():
 		selection = form.search_by.data
@@ -191,33 +192,42 @@ def search_clients():
 			client_results = Client.query.filter_by(first_name=form.search_field.data).all()
 		elif selection == '2':
 			client_results = Client.query.filter_by(last_name=form.search_field.data).all()
-		return render_template('search_clients.html', results=client_results, form=form)
+		elif selection == '3':
+			if not form.search_field.data.isalpha():
+				client_results = Client.query.filter_by(id=form.search_field.data).all()
+			else:
+				flash("Enter only numbers")
+		# return render_template('search_clients.html', results=client_results, form=form)
 
 	return render_template('search_clients.html', results=client_results, form=form)
 
+@app.route('/send-agreement', methods=['GET', 'POST'])
+@login_required
+def send_agreement():
+	client_result = ['', '', '', '', '']
+	search_form = SendAgreementSearch()
 
+	if search_form.validate_on_submit():
+		client_result = Client.query.filter_by(id=int(search_form.id_in.data)).all()
+		if client_result:
+			return render_template('send_agreement.html', search_form=search_form, 
+								   client=client_result, email=client_result[0].email)
+		else:
+			flash('No client found with that ID')
 
+	return render_template('send_agreement.html', search_form=search_form, 
+						   client=client_result, email='')
 
-# @app.route('/apptresults', methods=['GET', 'POST'])
-# @login_required
-# def appt_results(results):
-# 	table = SearchResults(results)
-# 	return render_template('results.html', table=table)
-
-# @app.route('/searchappt', methods=['GET', 'POST'])
-# @login_required
-# def search_appt():
-# 	search_form = SearchAppointmentForm()
-# 	if search_form.validate_on_submit():
-# 		selection = search_form.search_by.data
-# 		# if selection == '1':
-# 		# 	results = Appointment.query.filter_by(marketer=search_form.search_field.data).all()
-# 		if selection == '2':
-# 			results = Appointment.query.filter_by(client_first=search_form.search_field.data).all()
-# 		elif selection == '3':
-# 			results = Appointment.query.filter_by(date=search_form.search_field.data).all()
-# 		return appt_results(results)
-# 	return render_template('search_appt.html', search_form=search_form)
-
-
-
+@app.route('/email_process', methods=['GET', 'POST'])
+@login_required
+def email_process():
+	try:
+		email = request.args.get('email')
+		msg = Message("JMR Funding Contract", sender="jmrtestsend@gmail.com", recipients=[email])
+		with app.open_resource("JMR Merchant Agreement_encrypted_.pdf") as fp:
+			msg.attach("JMR Merchant Agreement_encrypted_.pdf", "application/pdf", fp.read())
+		mail.send(msg)
+		
+		return jsonify(success=1)
+	except Exception:
+		return jsonify(success=0)

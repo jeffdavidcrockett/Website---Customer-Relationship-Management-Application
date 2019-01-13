@@ -1,7 +1,10 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField
 from wtforms.validators import DataRequired
+from ToolsClass.tools import MyTools
 
+my_tools = MyTools()
+years = my_tools.get_posyears_set()
 
 class ClientForm(FlaskForm):
 	credit_menu = [('720+', '720+'), 
@@ -32,9 +35,9 @@ class LoginForm(FlaskForm):
 
 
 class CreateAppointmentForm(FlaskForm):
-	year_menu = [('2018', '2018'), ('2019', '2019'),
-				 ('2020', '2020'), ('2021', '2021'),
-				 ('2022', '2022'), ('2023', '2023')]
+	year_menu = [(str(years[0]), str(years[0])), (str(years[1]), str(years[1])),
+				 (str(years[2]), str(years[2])), (str(years[3]), str(years[3])),
+				 (str(years[4]), str(years[4])), (str(years[5]), str(years[5]))]
 
 	month_menu = [('01', 'Jan'), ('02', 'Feb'), ('03', 'Mar'), 
 				  ('04', 'Apr'), ('05', 'May'), ('06', 'Jun'), 
@@ -94,7 +97,8 @@ class MyAppointmentSearch(FlaskForm):
 
 class SearchClientForm(FlaskForm):
 	search_menu = [('1', 'First name'),
-				   ('2', 'Last name')]
+				   ('2', 'Last name'),
+				   ('3', 'ID')]
 	search_by = SelectField('Filter by', choices=search_menu, default=1)
 	search_field = StringField('Input', validators=[DataRequired()])
 	search = SubmitField('Search')
@@ -116,3 +120,7 @@ class NewClientDisplayOptions(FlaskForm):
 	display_by = SelectField('Filter by', choices=choices, default=1)
 	refresh = SubmitField('Refresh')
 
+
+class SendAgreementSearch(FlaskForm):
+	id_in = StringField('Enter Client ID:', validators=[DataRequired()])
+	lookup = SubmitField('Lookup Client')
