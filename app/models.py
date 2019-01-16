@@ -26,7 +26,7 @@ class Client(db.Model):
 	first_name = db.Column(db.String(64), index=True)
 	last_name = db.Column(db.String(64), index=True)
 	phone = db.Column(db.String(32))
-	email = db.Column(db.String(120), index=True)
+	email = db.Column(db.String(120), index=True, unique=True)
 	credit_score = db.Column(db.String(32), index=True)
 	desired_funding = db.Column(db.String(20))
 	signup_date = db.Column(db.String(20), index=True)
@@ -37,7 +37,7 @@ class Appointment(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	client_first = db.Column(db.String(120), index=True)
 	client_last = db.Column(db.String(120), index=True)
-	date = db.Column(db.String(30), index=True)
+	date = db.Column(db.Date, index=True)
 	time = db.Column(db.String(30), index=True)
 	notes = db.Column(db.String(120))
 	marketer_id = db.Column(db.Integer, db.ForeignKey('marketer.id'))
@@ -58,6 +58,17 @@ class Note(db.Model):
 	date = db.Column(db.String(10), index=True)
 
 
+class Interaction(db.Model):
+	id = db.Column(db.Integer, primary_key=True)
+	client_id = db.Column(db.Integer, index=True)
+	marketer = db.Column(db.String(30), index=True)
+	date = db.Column(db.String(10), index=True)
+	time = db.Column(db.String(30), index=True)
+	type_of = db.Column(db.String(30), index=True)
+	about = db.Column(db.String(140), index=True)
+
+
 @login.user_loader
 def load_user(id):
 	return Marketer.query.get(int(id))
+

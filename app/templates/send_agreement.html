@@ -35,8 +35,9 @@
     <script type="text/javascript">
         $(function() {
             var clientEmail = '{{ client[0].email }}';
+            
+        $('#sendlink').click(function() {
             if (clientEmail != "") {
-        $('#test').click(function() {
             if (confirm("Are you sure you want to send a contract to " + clientEmail + "?") == true) {
             $.ajax({
                 type: 'GET',
@@ -49,8 +50,10 @@
                 }
             });
         }
+        } else {
+            alert("Please enter the client's id you wish to send a contract to.")
+        }
         });
-    }
     });
     </script>
 
@@ -66,7 +69,7 @@
     	<div class="sidebar-wrapper">
             <div class="logo">
                 <a href="{{ url_for('manager') }}" class="simple-text">
-                    JMR Funding
+                    JMR Funding <img id="logosidebar" src="static/img/jmr_logo.jpg">
                 </a>
             </div>
 
@@ -86,7 +89,7 @@
                 <li>
                     <a href="{{ url_for('search_clients') }}">
                         <i class="pe-7s-science"></i>
-                        <p>Search Clients</p>
+                        <p>Clients</p>
                     </a>
                 </li>
                 <li class="active">
@@ -96,9 +99,9 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#">
+                    <a href="{{ url_for('our_data') }}">
                         <i class="pe-7s-bell"></i>
-                        <p>ReservedForFutureUse</p>
+                        <p>Our Data</p>
                     </a>
                 </li>
             </ul>
@@ -154,7 +157,7 @@
                     <ul class="nav navbar-nav navbar-right">
                         
                         <li class="dropdown">
-                              <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                              <!-- <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                                     <p>
 										OPTIONS
 										<b class="caret"></b>
@@ -169,7 +172,7 @@
                                 <li><a href="#">ReservedForFutureUse</a></li>
                                 <li><a href="#">ReservedForFutureUse</a></li>
                                 <li><a href="#">ReservedForFutureUse</a></li>
-                              </ul>
+                              </ul> -->
                         </li>
                         <li>
                             <a href="{{ url_for('logout') }}">
@@ -207,7 +210,7 @@
                     <div class="col-md-12">
                         <div class="card">
                             <div class="header">
-                                <h4 class="title">Appointment Results</h4>
+                                <h4 class="title">Client Results</h4>
                             </div>
                             <div class="content table-responsive table-full-width">
                                 <table class="table table-hover table-striped">
@@ -226,7 +229,7 @@
                                         	<td>{{ client[0].phone }}</td>
                                         	<td>{{ client[0].email }}</td>
                                             <td>
-                                                <a href="#" id="test">Send Email</a>
+                                                <a href="#" id="sendlink">Send Email</a>
                                             </td>
                                         </tr>
                                     </tbody>

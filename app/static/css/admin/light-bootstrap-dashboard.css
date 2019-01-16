@@ -107,6 +107,25 @@ h6, .h6 {
     text-transform: uppercase;
 }
 
+.testhr {
+    /*display: block;*/
+    /*position: relative;*/
+    /*float: left;*/
+    /*align-self: left;*/
+    
+    padding: 0;
+    margin: 0px;
+    height: 0;
+    width: 150px;
+    max-height: 0;
+    font-size: 1px;
+    line-height: 0;
+    /*clear: both;*/
+    /*border: none;*/
+    border-top: 1px solid #2c8ba0;
+    border-bottom: 1px solid #2c8ba0;
+}
+
 p {
     font-size: 16px;
     line-height: 1.5;
@@ -125,6 +144,11 @@ h1 small, h2 small, h3 small, h1 .small, h2 .small, h3 .small {
 h1 .subtitle {
     display: block;
     margin: 0 0 30px;
+}
+
+#logosidebar {
+    height: 40px;
+    width: 60px;
 }
 
 .text-muted {
@@ -443,13 +467,13 @@ input:focus {
 }
 
 .sidebar[data-color="blue"]:after {
-    background: #1F77D0;
-    background: -moz-linear-gradient(top, #1F77D0 0%, #533ce1 100%);
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #1F77D0), color-stop(100%, #533ce1));
-    background: -webkit-linear-gradient(top, #1F77D0 0%, #533ce1 100%);
-    background: -o-linear-gradient(top, #1F77D0 0%, #533ce1 100%);
-    background: -ms-linear-gradient(top, #1F77D0 0%, #533ce1 100%);
-    background: linear-gradient(to bottom, #1F77D0 0%, #533ce1 100%);
+    background: #000000;
+    background: -moz-linear-gradient(top, #000000 0%, #5ef9ff 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #000000), color-stop(100%, #533ce1));
+    background: -webkit-linear-gradient(top, #000000 0%, #5ef9ff 100%);
+    background: -o-linear-gradient(top, #000000 0%, #5ef9ff 100%);
+    background: -ms-linear-gradient(top, #000000 0%, #5ef9ff 100%);
+    background: linear-gradient(to bottom, #000000 0%, #5ef9ff 100%);
     background-size: 150% 150%;
 }
 

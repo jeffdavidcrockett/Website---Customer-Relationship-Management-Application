@@ -29,6 +29,8 @@
     <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
     <link href='http://fonts.googleapis.com/css?family=Roboto:400,700,300' rel='stylesheet' type='text/css'>
     <link href="static/css/admin/pe-icon-7-stroke.css" rel="stylesheet" />
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 </head>
 <body>
 
@@ -52,13 +54,13 @@
                         <p>Dashboard</p>
                     </a>
                 </li>
-                <li>
+                <li >
                     <a href="{{ url_for('my_appts') }}">
                         <i class="pe-7s-user"></i>
                         <p>Appointments</p>
                     </a>
                 </li>
-                <li  class="active">
+                <li>
                     <a href="{{ url_for('search_clients') }}">
                         <i class="pe-7s-science"></i>
                         <p>Clients</p>
@@ -70,7 +72,7 @@
                         <p>Send Agreement Email</p>
                     </a>
                 </li>
-                <li>
+                <li class="active">
                     <a href="{{ url_for('our_data') }}">
                         <i class="pe-7s-bell"></i>
                         <p>Our Data</p>
@@ -90,7 +92,7 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="#">Search Clients</a>
+                    <a class="navbar-brand" href="#">Our Data</a>
                 </div>
                 <div class="collapse navbar-collapse">
                     <ul class="nav navbar-nav navbar-left">
@@ -119,7 +121,7 @@
                               </ul>
                         </li>
                         <li>
-                           <a href="">
+                           <a href="#">
                                 <i class="fa fa-search"></i>
 								<p class="hidden-lg hidden-md">Search</p>
                             </a>
@@ -129,22 +131,22 @@
                     <ul class="nav navbar-nav navbar-right">
                         
                         <li class="dropdown">
-                              <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                              <!-- <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                                     <p>
-										CLIENT OPTIONS
+										OPTIONS
 										<b class="caret"></b>
 									</p>
 
                               </a>
                               <ul class="dropdown-menu">
-                                <li><a href="{{ url_for('view_client') }}">View Specific Client</a></li>
-                                <li><a href="#">Edit Specific Client</a></li>
-                                <!-- <li><a href="#">ReservedForFutureUse</a></li>
+                                <li><a href="#">ReservedForFutureUse</a></li>
                                 <li><a href="#">ReservedForFutureUse</a></li>
                                 <li><a href="#">ReservedForFutureUse</a></li>
                                 <li class="divider"></li>
-                                <li><a href="#">ReservedForFutureUse</a></li> -->
-                              </ul>
+                                <li><a href="#">ReservedForFutureUse</a></li>
+                                <li><a href="#">ReservedForFutureUse</a></li>
+                                <li><a href="#">ReservedForFutureUse</a></li>
+                              </ul> -->
                         </li>
                         <li>
                             <a href="{{ url_for('logout') }}">
@@ -168,68 +170,95 @@
         {% endwith %}
 
         <div>
-            <h1>&nbsp;&nbsp;Search Clients</h1>
-            <form style='margin-left: 40px' action="" method="post" novalidate>
-                {{ form.hidden_tag() }}
-                <p>{{ form.search_by.label }} {{ form.search_by }}</p>
-                <p>
-                    {{ form.search_field.label }}
-                    {{ form.search_field(size=32) }}
-                    {% for error in form.search_field.errors %}
-                    <span style="color:red;">[{{ error }}]</span>
-                    {% endfor %}
-                </p>
-                <p>{{ form.search() }}</p>
-            </form>
+            <h1>&nbsp;&nbsp;Our Data</h1>
         </div>
 
-        <div class="content">
+        <div class="content" >
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-md-12">
-                        <div class="card" style="height: 750px; overflow: auto;">
+                        <div class="card" style="height: 350px; overflow: auto;">
                             <div class="header">
-                                <h4 class="title">Client Results</h4>
+                                <h4 class="title">Current Marketers</h4>
                             </div>
                             <div class="content table-responsive table-full-width">
                                 <table class="table table-hover table-striped">
                                     <thead>
                                         <th>ID</th>
-                                        <th>First</th>
+                                    	<th>First</th>
                                     	<th>Last</th>
+                                        <th>Username</th>
                                     	<th>Phone</th>
                                     	<th>Email</th>
-                                    	<th>Credit Score</th>
-                                        <th>Desired Funding</th>
-                                        <!-- <th>View/Edit</th> -->
                                     </thead>
                                     <tbody>
-                                        {% for result in client_results %}
+                                        {% for marketer in marketers %}
                                         <tr>
-                                            <td>{{ result.id }}</td>
-                                        	<td>{{ result.first_name }}</td>
-                                        	<td>{{ result.last_name }}</td>
-                                        	<td>{{ result.phone }}</td>
-                                        	<td>{{ result.email }}</td>
-                                        	<td>{{ result.credit_score }}</td>
-                                            <td>{{ result.desired_funding }}</td>
-                                            <!-- <td><a href="{{ url_for('view_client') }}">Go To</a></td> -->
+                                        	<td>{{ marketer.id }}</td>
+                                        	<td>{{ marketer.first_name }}</td>
+                                        	<td>{{ marketer.last_name }}</td>
+                                            <td>{{ marketer.username }}</td>
+                                        	<td>{{ marketer.phone }}</td>
+                                        	<td>{{ marketer.email }}</td>
                                         </tr>
                                         {% endfor %}
                                     </tbody>
                                 </table>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="content" style="height: 500px; overflow: auto;">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="header">
+                                <h4 class="title">Company Stats</h4>
+                                <div>
+                                    <form style='margin-left: 40px; margin-top: 20px;' action="" method="post" novalidate>
+                                        {{ data_form.hidden_tag() }}
+                                        <p>{{ data_form.drop_menu.label }} {{ data_form.drop_menu }}</p>
+                                        <p>{{ data_form.submit() }}</p>
+                                    </form>
+                                </div>
+                            </div>
+                            <div class="content table-responsive table-full-width">
+                                <table class="table table-hover table-striped">
+                                    <!-- <thead>
+                                        <th>Appt ID</th>
+                                        <th>First</th>
+                                        <th>Last</th>
+                                        <th>Date</th>
+                                        <th>Time</th>
+                                        <th>Notes</th>
+                                    </thead> -->
+                                    <tbody>
+                                        <tr>
+                                            <td>New Clients: {{ num_of_clients }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+            </div>
+        </div>
+
+        
 
         <footer class="footer">
-            
+            <div class="container-fluid">
+                <nav class="pull-left">
+                </nav>
+            </div>
         </footer>
-
-
     </div>
 </div>
 
@@ -246,8 +275,10 @@
     <!--  Notifications Plugin    -->
     <script src="static/js/admin/bootstrap-notify.js"></script>
 
+    <!--  Google Maps Plugin    -->
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=YOUR_KEY_HERE"></script>
+
     <!-- Light Bootstrap Table Core javascript and methods for Demo purpose -->
 	<script src="static/js/admin/light-bootstrap-dashboard.js?v=1.4.0"></script>
-
 
 </html>

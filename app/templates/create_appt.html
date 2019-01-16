@@ -41,7 +41,7 @@
     	<div class="sidebar-wrapper">
             <div class="logo">
                 <a href="{{ url_for('manager') }}" class="simple-text">
-                    JMR Funding
+                    JMR Funding <img id="logosidebar" src="static/img/jmr_logo.jpg">
                 </a>
             </div>
 
@@ -61,7 +61,7 @@
                 <li>
                     <a href="{{ url_for('search_clients') }}">
                         <i class="pe-7s-science"></i>
-                        <p>Search Clients</p>
+                        <p>Clients</p>
                     </a>
                 </li>
                 <li>
@@ -71,9 +71,9 @@
                     </a>
                 </li>
                 <li>
-                    <a href="notifications.html">
+                    <a href="{{ url_for('our_data') }}">
                         <i class="pe-7s-bell"></i>
-                        <p>ReservedForFutureUse</p>
+                        <p>Our Data</p>
                     </a>
                 </li>
             </ul>
@@ -130,7 +130,7 @@
                         <li class="dropdown">
                               <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                                     <p>
-										OPTIONS
+										APPOINTMENTS OPTIONS
 										<b class="caret"></b>
 									</p>
 
@@ -138,11 +138,11 @@
                               <ul class="dropdown-menu">
                                 <li><a href="{{ url_for('my_appts') }}">My Appointments</a></li>
                                 <li><a href="{{ url_for('search_appt') }}">Search All Appointments</a></li>
-                                <li><a href="#">Edit Appointments</a></li>
-                                <li class="divider"></li>
+                                <!-- <li><a href="#">Edit Appointments</a></li> -->
+                                <!-- <li class="divider"></li>
                                 <li><a href="#">ReservedForFutureUse</a></li>
                                 <li><a href="#">ReservedForFutureUse</a></li>
-                                <li><a href="#">ReservedForFutureUse</a></li>
+                                <li><a href="#">ReservedForFutureUse</a></li> -->
                               </ul>
                         </li>
                         <li>

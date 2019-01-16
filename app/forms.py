@@ -28,8 +28,8 @@ class ClientForm(FlaskForm):
 
 
 class LoginForm(FlaskForm):
-	username = StringField('Username', validators=[DataRequired()])
-	password = PasswordField('Password', validators=[DataRequired()])
+	username = StringField('Username', validators=[DataRequired()], render_kw={"placeholder": "Username"})
+	password = PasswordField('Password', validators=[DataRequired()], render_kw={"placeholder": "Password"})
 	remember_me = BooleanField('Remember Me')
 	submit = SubmitField('Sign In')
 
@@ -124,3 +124,11 @@ class NewClientDisplayOptions(FlaskForm):
 class SendAgreementSearch(FlaskForm):
 	id_in = StringField('Enter Client ID:', validators=[DataRequired()])
 	lookup = SubmitField('Lookup Client')
+
+
+class DataSelection(FlaskForm):
+	choices = [('1', 'Today'), 
+			   ('2', 'This Month'),
+			   ('3', 'This Year')]
+	drop_menu = SelectField('Filter by', choices=choices, default=1)
+	submit = SubmitField('Refresh')

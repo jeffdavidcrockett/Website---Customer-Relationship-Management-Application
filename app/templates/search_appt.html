@@ -43,7 +43,7 @@
     	<div class="sidebar-wrapper">
             <div class="logo">
                 <a href="{{ url_for('manager') }}" class="simple-text">
-                    JMR Funding
+                    JMR Funding <img id="logosidebar" src="static/img/jmr_logo.jpg">
                 </a>
             </div>
 
@@ -63,7 +63,7 @@
                 <li>
                     <a href="{{ url_for('search_clients') }}">
                         <i class="pe-7s-science"></i>
-                        <p>Search Clients</p>
+                        <p>Clients</p>
                     </a>
                 </li>
                 <li>
@@ -73,9 +73,9 @@
                     </a>
                 </li>
                 <li>
-                    <a href="notifications.html">
+                    <a href="{{ url_for('our_data') }}">
                         <i class="pe-7s-bell"></i>
-                        <p>ReservedForFutureUse</p>
+                        <p>Our Data</p>
                     </a>
                 </li>
             </ul>
@@ -133,7 +133,7 @@
                         <li class="dropdown">
                               <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                                     <p>
-										OPTIONS
+										APPOINTMENTS OPTIONS
 										<b class="caret"></b>
 									</p>
 
@@ -141,11 +141,11 @@
                               <ul class="dropdown-menu">
                                 <li><a href="{{ url_for('my_appts') }}">My Appointments</a></li>
                                 <li><a href="{{ url_for('create_appt') }}">Create Appointment</a></li>
-                                <li><a href="#">Edit Appointments</a></li>
-                                <li class="divider"></li>
+                                <!-- <li><a href="#">Edit Appointments</a></li> -->
+                                <!-- <li class="divider"></li>
                                 <li><a href="#">ReservedForFutureUse</a></li>
                                 <li><a href="#">ReservedForFutureUse</a></li>
-                                <li><a href="#">ReservedForFutureUse</a></li>
+                                <li><a href="#">ReservedForFutureUse</a></li> -->
                               </ul>
                         </li>
                         <li>
@@ -159,24 +159,26 @@
             </div>
         </nav>
 
+        <span style="color:red;">
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            <ul>
+                {% for message in messages %}
+                <li style="color:red;">{{ message }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+            {% endwith %}
+        </span>
+
         <div>
             <h1>&nbsp;&nbsp;Search All Appointments</h1>
             <hr>
-            <span style="color:red;">
-                {% with messages = get_flashed_messages() %}
-                {% if messages %}
-                <ul>
-                    {% for message in messages %}
-                    <li style="color:red;">{{ message }}</li>
-                    {% endfor %}
-                </ul>
-                {% endif %}
-                {% endwith %}
-            </span>
-            <form style="margin-left: 40px" action="" method="get" novalidate>
+            
+            <form style="margin-left: 40px" action="" method="post" novalidate>
                 {{ form.hidden_tag() }}
                 <p>{{ form.search_by.label }} {{ form.search_by }}</p>
-                <p class="category">Date format: 2018-09-29</p>
+                <p class="category">**** Date format: 2018-09-29 ****</p>
                 <p>
                     {{ form.search_field.label }}
                     {{ form.search_field(size=32) }}
@@ -199,6 +201,7 @@
                             <div class="content table-responsive table-full-width">
                                 <table class="table table-hover table-striped">
                                     <thead>
+                                        <th>Appt ID</th>
                                         <th>Mark.</th>
                                         <th>First</th>
                                     	<th>Last</th>
@@ -209,6 +212,7 @@
                                     <tbody>
                                         {% for result in results %}
                                         <tr>
+                                            <td>{{ result.id }}</td>
                                             <td>{{ result.creator }}</td>
                                         	<td>{{ result.client_first }}</td>
                                         	<td>{{ result.client_last }}</td>

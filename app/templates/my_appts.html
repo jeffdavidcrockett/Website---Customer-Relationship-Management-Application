@@ -24,11 +24,36 @@
     <!--  CSS for Demo Purpose, don't include it in your project     -->
     <link href="static/css/admin/demo.css" rel="stylesheet" />
 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
 
     <!--     Fonts and icons     -->
     <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
     <link href='http://fonts.googleapis.com/css?family=Roboto:400,700,300' rel='stylesheet' type='text/css'>
     <link href="static/css/admin/pe-icon-7-stroke.css" rel="stylesheet" />
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('#deletebtn').click(function() {
+                var id_val = $('#id_input').val();
+                if (id_val != '') {
+                    if (confirm('Are you sure you want to permanently delete appointment with the id of ' + id_val + '?') == true) {
+                        $.ajax({
+                            type: 'GET',
+                            url: '/delete_appt',
+                            data: {apptId: id_val},
+                            dataType: 'text',
+                            contentType: 'application/json;charset=UTF-8',
+                            success: function(data) {
+                                alert(data);
+                            }
+                        });
+                    }
+                } else {
+                    alert('Please enter an appointment id to delete.');
+                }
+            });
+        });
+    </script>
 </head>
 <body>
 
@@ -41,7 +66,7 @@
     	<div class="sidebar-wrapper">
             <div class="logo">
                 <a href="{{ url_for('manager') }}" class="simple-text">
-                    JMR Funding
+                    JMR Funding <img id="logosidebar" src="static/img/jmr_logo.jpg">
                 </a>
             </div>
 
@@ -61,7 +86,7 @@
                 <li>
                     <a href="{{ url_for('search_clients') }}">
                         <i class="pe-7s-science"></i>
-                        <p>Search Clients</p>
+                        <p>Clients</p>
                     </a>
                 </li>
                 <li>
@@ -71,9 +96,9 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#">
+                    <a href="{{ url_for('our_data') }}">
                         <i class="pe-7s-bell"></i>
-                        <p>ReservedForFutureUse</p>
+                        <p>Our Data</p>
                     </a>
                 </li>
             </ul>
@@ -131,7 +156,7 @@
                         <li class="dropdown">
                               <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                                     <p>
-										OPTIONS
+										APPOINTMENTS OPTIONS
 										<b class="caret"></b>
 									</p>
 
@@ -139,11 +164,11 @@
                               <ul class="dropdown-menu">
                                 <li><a href="{{ url_for('create_appt') }}">Create Appointment</a></li>
                                 <li><a href="{{ url_for('search_appt') }}">Search All Appointments</a></li>
-                                <li><a href="#">Edit Appointments</a></li>
-                                <li class="divider"></li>
+                                <!-- <li><a href="#">Edit Appointments</a></li> -->
+                                <!-- <li class="divider"></li>
                                 <li><a href="#">ReservedForFutureUse</a></li>
                                 <li><a href="#">ReservedForFutureUse</a></li>
-                                <li><a href="#">ReservedForFutureUse</a></li>
+                                <li><a href="#">ReservedForFutureUse</a></li> -->
                               </ul>
                         </li>
                         <li>
@@ -173,11 +198,16 @@
                         <div class="card">
                             <div class="header">
                                 <h4 class="title">Appointment Results</h4>
+                                <div style="float: right;">
+                                    <h5>Delete Appointment</h5>
+                                    <input type="text" name="idinput" id="id_input" placeholder="Appt ID" style="width: 80px;">
+                                    <button id="deletebtn">Delete</button>
+                                </div>
                             </div>
                             <div class="content table-responsive table-full-width">
                                 <table class="table table-hover table-striped">
                                     <thead>
-                                        <th>Mark.</th>
+                                        <th>Appt ID</th>
                                         <th>First</th>
                                     	<th>Last</th>
                                     	<th>Date</th>
@@ -187,7 +217,7 @@
                                     <tbody>
                                         {% for appt in appointments %}
                                         <tr>
-                                            <td>{{ appt.creator }}</td>
+                                            <td>{{ appt.id }}</td>
                                         	<td>{{ appt.client_first }}</td>
                                         	<td>{{ appt.client_last }}</td>
                                         	<td>{{ appt.date }}</td>

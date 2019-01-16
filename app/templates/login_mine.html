@@ -2,6 +2,7 @@
 <html>
 <head>
 	<title>Sign In</title>
+	<link href="static/css/admin/login.css" type="text/css" rel="stylesheet"/>
 </head>
 <body>
 	{% with messages = get_flashed_messages() %}
@@ -14,26 +15,29 @@
 	<hr>
 	{% endif %}
 	{% endwith %}
-	<h1>Sign In</h1>
-	<form action="" method="post" novalidate>
-		{{ form.hidden_tag() }}
-		<p>
-			{{ form.username.label }}
-			{{ form.username(size=32) }}
-			{% for error in form.username.errors %}
-			<span style="color:red;">[{{ error }}]</span>
-			{% endfor %}
-		</p>
-		<p>
-			{{ form.password.label }}
-			{{ form.password(size=32) }}
-			{% for error in form.password.errors %}
-			<span style="color:red;">[{{ error }}]</span>
-			{% endfor %}
-		</p>
-		<p>{{ form.remember_me() }} {{ form.remember_me.label }}</p>
-		<p>{{ form.submit() }}</p>
-	</form>
+	<div id="main_div">
+		
+		
+		<form action="" method="post" novalidate style="text-align: center; margin: auto;">
+			<img id="logo" src="static/img/jmr_logo.jpg">
+			<h1>Sign In</h1>
+			{{ form.hidden_tag() }}
+			<p>
+				{{ form.username(size=32) }}
+				{% for error in form.username.errors %}
+				<span style="color:red;">[{{ error }}]</span>
+				{% endfor %}
+			</p>
+			<p>
+				{{ form.password(size=32) }}
+				{% for error in form.password.errors %}
+				<span style="color:red;">[{{ error }}]</span>
+				{% endfor %}
+			</p>
+			<p>{{ form.remember_me() }} {{ form.remember_me.label(class_='wtf_label') }}</p>
+			<p>{{ form.submit() }}</p>
+		</form>
+	</div>
 </body>
 </html>
 	

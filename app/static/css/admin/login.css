@@ -1,0 +1,19 @@
+body {
+	background-color: #282828;
+}
+
+h1 {
+	font-size: 50px;
+	font-family: "Roboto","Helvetica Neue",Arial,sans-serif;
+	color: #d8cbcb;
+}
+
+#logo {
+	height: 200px;
+	width: 300px;
+}
+
+.wtf_label {
+	font-family: "Roboto","Helvetica Neue",Arial,sans-serif;
+	color: #d8cbcb;
+}
