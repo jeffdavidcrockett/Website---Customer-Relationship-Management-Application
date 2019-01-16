@@ -176,21 +176,21 @@
                 <p>{{ client_search.lookup() }}</p>
             </form>
             </div>
-            <h5>ID: {{ client[0].id }}</h5>
+            <h5>ID: {{ client.id }}</h5>
             <hr class="testhr">
-            <h5>First name: {{ client[0].first_name }}</h5>
+            <h5>First name: {{ client.first_name }}</h5>
             <hr class="testhr">
-            <h5>Last name: {{ client[0].last_name }}</h5>
+            <h5>Last name: {{ client.last_name }}</h5>
             <hr class="testhr">
-            <h5>Phone: {{ client[0].phone }}</h5>
+            <h5>Phone: {{ client.phone }}</h5>
             <hr class="testhr">
-            <h5>Email: {{ client[0].email }}</h5>
+            <h5>Email: {{ client.email }}</h5>
             <hr class="testhr">
-            <h5>Credit score: {{ client[0].credit_score }}</h5>
+            <h5>Credit score: {{ client.credit_score }}</h5>
             <hr class="testhr">
-            <h5>Desired funding: {{ client[0].desired_funding }}</h5>
+            <h5>Desired funding: {{ client.desired_funding }}</h5>
             <hr class="testhr">
-            <h5>Signup date: {{ client[0].signup_date }}</h5>
+            <h5>Signup date: {{ client.signup_date }}</h5>
         </div>
 
         <div class="content">
@@ -200,6 +200,10 @@
                         <div class="card" style="height: 600px; overflow: auto;">
                             <div class="header">
                                 <h4 class="title">Interaction History</h4>
+                                <div style="margin-top: 10px;">
+                                <!-- {{ interact_btn.add_btn() }} -->
+                                <a href="{{ url_for('add_interaction', client_id=client.id) }}">Add Interaction</a>
+                                </div>
                             </div>
                             <div class="content table-responsive table-full-width">
                                 <table class="table table-hover table-striped">

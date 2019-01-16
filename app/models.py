@@ -71,4 +71,3 @@ class Interaction(db.Model):
 @login.user_loader
 def load_user(id):
 	return Marketer.query.get(int(id))
-

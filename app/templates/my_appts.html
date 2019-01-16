@@ -183,7 +183,7 @@
         </nav>
 
         <div>
-            <h1>&nbsp;&nbsp;{{ current_user }}'s Appointments</h1>
+            <h1 style="margin-left: 35px;">{{ current_user }}'s Appointments</h1>
             <form style='margin-left: 40px' action="" method="post" novalidate>
                 {{ form.hidden_tag() }}
                 <p>{{ form.filter_menu.label }} {{ form.filter_menu }}</p>
@@ -191,11 +191,11 @@
             </form>
         </div>
 
-        <div class="content" style="height: 500px; overflow: auto;">
+        <div class="content">
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-md-12">
-                        <div class="card">
+                        <div class="card" style="height: 700px; overflow: auto;">
                             <div class="header">
                                 <h4 class="title">Appointment Results</h4>
                                 <div style="float: right;">

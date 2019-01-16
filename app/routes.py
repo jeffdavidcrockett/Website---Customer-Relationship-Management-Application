@@ -1,7 +1,7 @@
 from flask import render_template, flash, redirect, url_for, request, jsonify
 from app import app, db, mail
 from app.forms import LoginForm, CreateAppointmentForm, SearchAppointmentForm, ClientForm, MessageInput, NoteInput, SearchClientForm, \
-MyAppointmentSearch, NewClientDisplayOptions, SendAgreementSearch, DataSelection
+MyAppointmentSearch, NewClientDisplayOptions, SendAgreementSearch, DataSelection, AddInteractionForm, PreInteractButton
 from flask_login import current_user, login_user, login_required, logout_user
 from app.models import Marketer, Appointment, Memo, Note, Client, Interaction
 from werkzeug.urls import url_parse
@@ -15,13 +15,14 @@ from sqlalchemy import func, distinct, extract
 
 my_tools = MyTools()
 
-@app.route('/test2', methods=['GET', 'POST'])
-def test2():
-	return render_template('test2.html')
-
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
+@login_required
 def index():
+	"""
+	Test Client sign up page. Probably will be deleted. Client enters information 
+	and is logged into database table Client.
+	"""
 	client_form = ClientForm()
 
 	if client_form.validate_on_submit():
@@ -42,8 +43,12 @@ def index():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+	"""
+	Login page for employees. If user is already logged in, they are redirected to 
+	the manager dashboard page.
+	"""
 	if current_user.is_authenticated:
-		return redirect(url_for('index'))
+		return redirect(url_for('manager'))
 	form = LoginForm()
 
 	if form.validate_on_submit():
@@ -57,16 +62,23 @@ def login():
 			next_page = url_for('manager')
 		return redirect(next_page)
 
-	return render_template('login_mine.html', form=form)
+	return render_template('login.html', form=form)
 
 @app.route('/logout')
 def logout():
+	"""
+	Logs the current user out and redirects to login page.
+	"""
 	logout_user()
 	return redirect(url_for('login'))
 
 @app.route('/manager', methods=['GET', 'POST'])
 @login_required
 def manager():
+	"""
+	Main dashboard page for authenticated employees. New and uncontacted clients are displayed.
+	Also, there is a global message board as well as a personal notepad.
+	"""
 	mssgs = db.session.query(Memo).order_by(Memo.id.desc()).limit(20)
 	notes = db.session.query(Note).order_by(Note.id.desc()).limit(20)
 	appts_query = Appointment.query.filter_by(date=str(datetime.date.today())).all()
@@ -103,34 +115,47 @@ def manager():
 @app.route('/my-appts', methods=['GET', 'POST'])
 @login_required
 def my_appts():
+	"""
+	User's appointments are displayed. Can choose between displaying today's appointments, this 
+	weeks's appointments, and this month's appointments. Also, user can delete their appointments. 
+	It is done through jQuery/JSON/AJAX, so look on this route's HTML page for script. The route that 
+	the AJAX activates is delete_appt(). 
+	"""
 	form = MyAppointmentSearch()
 	appointments = Appointment.query.filter_by(date=str(datetime.date.today())).all()
 
 	if form.validate_on_submit():
-		if form.filter_menu.data == '1':
-			appointments = Appointment.query.filter_by(date=str(datetime.date.today())).all()
-		elif form.filter_menu.data == '2':
+		selection = form.filter_menu.data
+		if selection == '2':
 			current_date = my_tools.get_current_date()
 			endof_week = my_tools.get_endof_week()
 			appointments = db.session.query(Appointment).filter(Appointment.date.between(current_date, 
 														 endof_week)).order_by(Appointment.date.asc())
+		elif selection == '3':
+			start_date, end_date = my_tools.getcurrent_beginend_ofmonth()
+			appointments = db.session.query(Appointment).filter(Appointment.date.between(start_date, 
+														 end_date)).order_by(Appointment.date.asc())
 		else:
-			# appointments = Appointment.query.filter()
-			pass
+			return redirect(url_for('my_appts'))
 
 	return render_template('my_appts.html', form=form, appointments=appointments)
 
 @app.route('/createappt', methods=['GET', 'POST'])
 @login_required
 def create_appt():
+	"""
+	User can create appointments. It will log appointments into database, as well as the 
+	interaction of 'Appointment'.
+	"""
 	create_form = CreateAppointmentForm()
 
 	if create_form.validate_on_submit():
-		date = create_form.year.data + '-' + create_form.month.data + '-' + create_form.day.data
+		date = create_form.year_menu.data + '-' + create_form.month_menu.data + '-' + create_form.day_menu.data
 		date_obj = datetime.datetime.strptime(date, '%Y-%m-%d').date() 
-		time = create_form.hour.data + ':' + create_form.minute.data + ' ' + create_form.ampm.data
+		time = create_form.hour_menu.data + ':' + create_form.minute_menu.data + ' ' + create_form.ampm_menu.data
 		
 		if create_form.client_id1.data == create_form.client_id2.data:
+
 			client = Client.query.filter_by(id=create_form.client_id1.data).first()
 
 			if client:
@@ -164,6 +189,10 @@ def create_appt():
 @app.route('/search-appt', methods=['GET', 'POST'])
 @login_required
 def search_appt():
+	"""
+	User can do a global search of all appointments by all users. Can search by Marketer ID, 
+	Client first, Client last, and date. Date must be formatted as example: 2019-03-05.
+	"""
 	form = SearchAppointmentForm()
 	appt_results = db.session.query(Appointment).order_by(Appointment.id.desc()).limit(15)
 
@@ -199,6 +228,10 @@ def search_appt():
 @app.route('/search-clients', methods=['GET', 'POST'])
 @login_required
 def search_clients():
+	"""
+	Global search of all clients. Can search by client's first name, last name, and
+	client id.
+	"""
 	form = SearchClientForm()
 	client_results = db.session.query(Client).order_by(Client.id.desc()).limit(100)
 
@@ -219,6 +252,11 @@ def search_clients():
 @app.route('/send-agreement', methods=['GET', 'POST'])
 @login_required
 def send_agreement():
+	"""
+	Allows marketer to send an email to a specific client. jQuery/JSON/AJAX is used, so look for 
+	the script at top of send_agreement.html file. The route that is activated by AJAX is 
+	email_process().
+	"""
 	client_result = ['']
 	email = ''
 	search_form = SendAgreementSearch()
@@ -236,6 +274,10 @@ def send_agreement():
 @app.route('/email_process', methods=['GET', 'POST'])
 @login_required
 def email_process():
+	"""
+	This is the route that is activated by AJAX that comes from the send_agreement()
+	route.
+	"""
 	try:
 		email = request.args.get('email')
 		msg = Message("JMR Funding Contract", sender="jmrtestsend@gmail.com", recipients=[email])
@@ -243,29 +285,66 @@ def email_process():
 			msg.attach("JMR Merchant Agreement_encrypted_.pdf", "application/pdf", fp.read())
 		mail.send(msg)
 		
-		return jsonify(success=1)
-	except Exception:
-		return jsonify(success=0)
+		return jsonify("Email was successfully sent to " + email)
+	except Exception as e:
+		return jsonify("ERROR. EMAIL FAILED TO SEND TO " + email)
 
-@app.route('/view_edit', methods=['GET', 'POST'])
+@app.route('/view_client', methods=['GET', 'POST'])
 @login_required
 def view_client():
+	"""
+	This allows user to view a specific client in more detail, the client ID is used to
+	search. They can add interactions when a specific user is pulled up. This is done 
+	from the HTML file.
+	"""
 	client_search = SendAgreementSearch()
-	client_results = ['']
+	interact_btn = PreInteractButton()
+	client_result = ''
 	interaction_results = ['']
 
 	if client_search.validate_on_submit():
-		client_results = Client.query.filter_by(id=client_search.id_in.data).all()
+		client_result = Client.query.filter_by(id=client_search.id_in.data).first()
 		interaction_results = Interaction.query.filter_by(client_id=client_search.id_in.data).all()
-		return render_template('specific_client.html', client_search=client_search, 
-								client=client_results, interactions=interaction_results)
 
 	return render_template('specific_client.html', client_search=client_search, 
-							client=client_results, interactions=interaction_results)
+							client=client_result, interactions=interaction_results, 
+							interact_btn=interact_btn)
+
+@app.route('/add_interact', methods=['GET', 'POST'])
+@login_required
+def add_interaction(client=None):
+	"""
+	Route activated from the specific_client.html file (from JSON?). Details of interaction 
+	can be added and is logged to the database in Interaction table.
+	"""
+	client_id = request.args.get('client_id', None)
+	client_result = Client.query.filter_by(id=client_id).first()
+	interact_form = AddInteractionForm()
+
+	if interact_form.validate_on_submit():
+		date = interact_form.year_menu.data + '-' + interact_form.month_menu.data + '-' + interact_form.day_menu.data
+		date_obj = datetime.datetime.strptime(date, '%Y-%m-%d').date()
+		time = interact_form.hour_menu.data + ':' + interact_form.minute_menu.data + ' ' + interact_form.ampm_menu.data
+
+		interaction = Interaction(client_id=client_id, 
+								  marketer=str(current_user),
+								  date=date_obj, 
+								  time=time, 
+								  type_of=interact_form.choices_menu.data, 
+								  about=interact_form.details.data)
+		db.session.add(interaction)
+		db.session.commit()
+		flash("Interaction added")
+
+	return render_template('add_interact.html', client=client_result, interact_form=interact_form)
 
 @app.route('/delete_appt', methods=['GET', 'POST'])
 @login_required
 def delete_appt():
+	"""
+	Activated through AJAX from my_appt() route. Will *not* allow a marketer to delete 
+	other marketer's appointments, only their own.
+	"""
 	try:
 		appt_id = request.args.get('apptId')
 		appt = Appointment.query.filter_by(id=appt_id).first()
@@ -285,6 +364,9 @@ def delete_appt():
 @app.route('/data', methods=['GET', 'POST'])
 @login_required
 def our_data():
+	"""
+	Displays information gathered from database. Under construction.
+	"""
 	data_form = DataSelection()
 
 	marketers = Marketer.query.all()

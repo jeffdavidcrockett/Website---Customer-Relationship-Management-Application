@@ -8,20 +8,20 @@ class MyTools:
         """
         Returns the current year.
         """
-        current_year = int(date.today().year)
 
-        return current_year
+        return int(date.today().year)
 
     def get_current_month(self):
         """
         Returns the current month in string format. If the month val's length is
         one, a zero is concatenated to the front month val.
         """
-        month = datetime.date.today().month
-        # if len(month) == 1:
-        #     month = '0' + month
 
-        return month
+        return datetime.date.today().month
+
+    def get_current_day(self):
+
+        return datetime.date.today().day
 
     def get_current_date(self):
         """
@@ -86,6 +86,3 @@ class MyTools:
         current_time = datetime.datetime.now(our_zone)
 
         return str(current_time.strftime('%I:%M %p'))
-
-    
-

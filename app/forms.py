@@ -6,6 +6,42 @@ from ToolsClass.tools import MyTools
 my_tools = MyTools()
 years = my_tools.get_posyears_set()
 
+default_year = str(my_tools.get_current_year())
+default_month = str(my_tools.get_current_month())
+if len(default_month) == 1:
+	default_month = '0' + default_month
+default_day = str(my_tools.get_current_day())
+if len(default_day) == 1:
+	default_day = '0' + default_day
+
+years_ = [(str(years[0]), str(years[0])), (str(years[1]), str(years[1])),
+	      (str(years[2]), str(years[2])), (str(years[3]), str(years[3])),
+		  (str(years[4]), str(years[4])), (str(years[5]), str(years[5]))]
+
+months = [('01', 'Jan'), ('02', 'Feb'), ('03', 'Mar'), 
+		  ('04', 'Apr'), ('05', 'May'), ('06', 'Jun'), 
+		  ('07', 'Jul'), ('08', 'Aug'), ('09', 'Sep'),
+		  ('10', 'Oct'), ('11', 'Nov'), ('12', 'Dec')]
+
+days = [('01', '01'), ('02', '02'), ('03', '03'), ('04', '04'), 
+		('05', '05'), ('06', '06'), ('07', '07'), ('08', '08'), 
+	    ('09', '09'), ('10', '10'), ('11', '11'), ('12', '12'), 
+		('13', '13'), ('14', '14'), ('15', '15'), ('16', '16'), 
+		('17', '17'), ('18', '18'), ('19', '19'), ('20', '20'), 
+		('21', '21'), ('22', '22'), ('23', '23'), ('24', '24'), 
+		('25', '25'), ('26', '26'), ('27', '27'), ('28', '28'), 
+		('29', '29'), ('30', '30'), ('31', '31')]
+
+hours = [('1', '1'), ('2', '2'), ('3', '3'), ('4', '4'), 
+		 ('5', '5'), ('6', '6'), ('7', '7'), ('8', '8'), 
+		 ('9', '9'), ('10', '10'), ('11', '11'), ('12', '12')]
+
+minutes = [('00', '00'), ('05', '05'), ('10', '10'), ('15', '15'), 
+		   ('20', '20'), ('25', '25'), ('30', '30'), ('35', '35'),
+		   ('40', '40'), ('45', '45'), ('50', '50'), ('55', '55')]
+
+ampm = [('AM', 'AM'), ('PM', 'PM')]
+
 class ClientForm(FlaskForm):
 	credit_menu = [('720+', '720+'), 
 				   ('680 - 719', '680 - 719'), 
@@ -35,42 +71,14 @@ class LoginForm(FlaskForm):
 
 
 class CreateAppointmentForm(FlaskForm):
-	year_menu = [(str(years[0]), str(years[0])), (str(years[1]), str(years[1])),
-				 (str(years[2]), str(years[2])), (str(years[3]), str(years[3])),
-				 (str(years[4]), str(years[4])), (str(years[5]), str(years[5]))]
-
-	month_menu = [('01', 'Jan'), ('02', 'Feb'), ('03', 'Mar'), 
-				  ('04', 'Apr'), ('05', 'May'), ('06', 'Jun'), 
-				  ('07', 'Jul'), ('08', 'Aug'), ('09', 'Sep'),
-				  ('10', 'Oct'), ('11', 'Nov'), ('12', 'Dec')]
-
-	day_menu = [('01', '01'), ('02', '02'), ('03', '03'), ('04', '04'), 
-				('05', '05'), ('06', '06'), ('07', '07'), ('08', '08'), 
-				('09', '09'), ('10', '10'), ('11', '11'), ('12', '12'), 
-				('13', '13'), ('14', '14'), ('15', '15'), ('16', '16'), 
-				('17', '17'), ('18', '18'), ('19', '19'), ('20', '20'), 
-				('21', '21'), ('22', '22'), ('23', '23'), ('24', '24'), 
-				('25', '25'), ('26', '26'), ('27', '27'), ('28', '28'), 
-				('29', '29'), ('30', '30'), ('31', '31')]
-
-	hour_menu = [('1', '1'), ('2', '2'), ('3', '3'), ('4', '4'), 
-				 ('5', '5'), ('6', '6'), ('7', '7'), ('8', '8'), 
-				 ('9', '9'), ('10', '10'), ('11', '11'), ('12', '12')]
-
-	minute_menu = [('00', '00'), ('05', '05'), ('10', '10'), ('15', '15'), 
-				   ('20', '20'), ('25', '25'), ('30', '30'), ('35', '35'),
-				   ('40', '40'), ('45', '45'), ('50', '50'), ('55', '55')]
-
-	ampm_menu = [('AM', 'AM'), ('PM', 'PM')]
-
 	client_id1 = StringField('Client ID', validators=[DataRequired()])
 	client_id2 = StringField('Client ID again', validators=[DataRequired()])
-	year = SelectField('Year', choices=year_menu, default='2018')
-	month = SelectField('Month', choices=month_menu, default='01')
-	day = SelectField('Day', choices=day_menu, default='00')
-	hour = SelectField('Hour', choices=hour_menu, default='1')
-	minute = SelectField('Min.', choices=minute_menu, default='00')
-	ampm = SelectField('', choices=ampm_menu, default='AM')
+	year_menu = SelectField('Year', choices=years_, default=default_year)
+	month_menu = SelectField('Month', choices=months, default=default_month)
+	day_menu = SelectField('Day', choices=days, default=default_day)
+	hour_menu = SelectField('Hour', choices=hours, default='1')
+	minute_menu = SelectField('Min.', choices=minutes, default='00')
+	ampm_menu = SelectField('', choices=ampm, default='AM')
 	notes = StringField('Notes', validators=[DataRequired()])
 	create = SubmitField('Create Appt')
 
@@ -126,9 +134,30 @@ class SendAgreementSearch(FlaskForm):
 	lookup = SubmitField('Lookup Client')
 
 
+class PreInteractButton(FlaskForm):
+	add_btn = SubmitField('Add Interaction')
+
+
 class DataSelection(FlaskForm):
 	choices = [('1', 'Today'), 
 			   ('2', 'This Month'),
 			   ('3', 'This Year')]
 	drop_menu = SelectField('Filter by', choices=choices, default=1)
 	submit = SubmitField('Refresh')
+
+
+class AddInteractionForm(FlaskForm):
+	choices = [('Applied for credit cards', 'Applied for credit cards'),
+			   ('Credit Card Approval', 'Credit Card Approval'), 
+			   ('Appointment', 'Appointment'),
+			   ('Received contract from', 'Received contract from')]
+
+	year_menu = SelectField('Year', choices=years_, default=default_year)
+	month_menu = SelectField('Month', choices=months, default=default_month)
+	day_menu = SelectField('Day', choices=days, default=default_day)
+	hour_menu = SelectField('Hour', choices=hours, default='1')
+	minute_menu = SelectField('Minutes', choices=minutes, default='00')
+	ampm_menu = SelectField('', choices=ampm, default='AM')
+	choices_menu = SelectField('Interaction Type', choices=choices, default=1)
+	details = StringField('Details', validators=[DataRequired()])
+	submit = SubmitField('Submit')
