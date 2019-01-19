@@ -30,6 +30,7 @@ class Client(db.Model):
 	credit_score = db.Column(db.String(32), index=True)
 	desired_funding = db.Column(db.String(20))
 	signup_date = db.Column(db.String(20), index=True)
+	status = db.Column(db.String(50))
 	appointments = db.relationship('Appointment', backref='client', lazy='dynamic')
 
 
@@ -71,3 +72,4 @@ class Interaction(db.Model):
 @login.user_loader
 def load_user(id):
 	return Marketer.query.get(int(id))
+ 

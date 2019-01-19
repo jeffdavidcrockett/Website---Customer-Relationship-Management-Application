@@ -29,7 +29,6 @@
     <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
     <link href='http://fonts.googleapis.com/css?family=Roboto:400,700,300' rel='stylesheet' type='text/css'>
     <link href="static/css/admin/pe-icon-7-stroke.css" rel="stylesheet" />
-
 </head>
 <body>
 
@@ -78,7 +77,7 @@
                 <li>
                     <a href="{{ url_for('our_data') }}">
                         <i class="pe-7s-bell"></i>
-                        <p>Our Data</p>
+                        <p id="testpp">Our Data</p>
                     </a>
                 </li>
             </ul>
@@ -197,7 +196,6 @@
                                     <p>{{ clients_display_form.display_by.label }} 
                                     {{ clients_display_form.display_by }} {{ clients_display_form.refresh() }}</p>
                                 </form>
-                                
                             </div>
                             <div class="content" style="height: 392px; overflow: auto;">
                                 <div class="content table-responsive table-full-width">
@@ -213,7 +211,7 @@
                                     </thead>
                                     <tbody>
                                         {% for result in results %}
-                                        <tr>
+                                        <tr onclick="goToClient(this)">
                                             <td>{{ result.id }}</td>
                                             <td>{{ result.first_name }}</td>
                                             <td>{{ result.last_name }}</td>
@@ -221,13 +219,15 @@
                                             <td>{{ result.email }}</td>
                                             <td>{{ result.credit_score }}</td>
                                             <td>{{ result.desired_funding }}</td>
+                                            <td>
+                                                <a href="{{ url_for('view_client', client_id=result.id) }}">Go To</a>
+                                            </td>
                                         </tr>
                                         {% endfor %}
                                     </tbody>
                                 </table>
                             </div>
                                 <div class="footer">
-                                    
                                 </div>
                             </div>
                         </div>
@@ -317,6 +317,7 @@
 
 
 </body>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 
     <!--   Core JS Files   -->
     <script src="static/js/admin/jquery.3.2.1.min.js" type="text/javascript"></script>
@@ -328,17 +329,14 @@
     <!--  Notifications Plugin    -->
     <script src="static/js/admin/bootstrap-notify.js"></script>
 
-    <!--  Google Maps Plugin    -->
-    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=YOUR_KEY_HERE"></script>
-
     <!-- Light Bootstrap Table Core javascript and methods for Demo purpose -->
 	<script src="static/js/admin/light-bootstrap-dashboard.js?v=1.4.0"></script>
 
-	<!-- Light Bootstrap Table DEMO methods, don't include it in your project! -->
-	<script src="static/js/admin/demo.js"></script>
+    <!-- my person js scripts -->
+    <!-- <script src="static\js\admin\my-js-scripts.js" type="text/javascript"></script> -->
 
 	<script type="text/javascript">
-        var num_of_appts = {{ appts|tojson }};
+        var num_of_appts = '{{ appts|tojson }}';
     	$(document).ready(function(){
 
         	demo.initChartist();
@@ -354,5 +352,13 @@
 
     	});
 	</script>
+    <!-- <script type="text/javascript">
+        function goToClient(element) {
+            var row_index = element.rowIndex - 1;
+            alert(row_index);
+        }
+    </script> -->
+
+    
 
 </html>

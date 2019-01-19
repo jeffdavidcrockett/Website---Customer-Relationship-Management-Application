@@ -168,28 +168,29 @@
         {% endwith %}
 
         <div style="margin-left: 40px;">
-            <div>
-                <div style="margin-bottom: 50px;">
-                    <h1>View Client</h1>
-                </div>
+            <h1>View Client</h1>
+            <div style="margin-top: 40px; margin-bottom: 40px;">
+            <form action="" method="post" novalidate>
+                {{ client_search.hidden_tag() }}
+                <p>{{ client_search.id_in.label }} {{ client_search.id_in }}</p>
+                <p>{{ client_search.lookup() }}</p>
+            </form>
             </div>
-            
-            <h3>{{ client.first_name }} {{ client.last_name }}</h3>
-            <h3 style="color: green;"><b>Current Status: {{ client.status }}</b></h3>
-            <div>
-                <div style="float: left; margin-right: 200px;">
-                    <h5>ID: {{ client.id }}</h5>
-                    <h5>First name: {{ client.first_name }}</h5>
-                    <h5>Last name: {{ client.last_name }}</h5>
-                    <h5>Desired funding: {{ client.desired_funding }}</h5>
-                </div>
-                <div style="float: left;">
-                    <h5>Phone: {{ client.phone }}</h5>
-                    <h5>Email: {{ client.email }}</h5>
-                    <h5>Credit score: {{ client.credit_score }}</h5>
-                    <h5>Signup date: {{ client.signup_date }}</h5>
-                </div>
-            </div>
+            <h5>ID: {{ client.id }}</h5>
+            <hr class="testhr">
+            <h5>First name: {{ client.first_name }}</h5>
+            <hr class="testhr">
+            <h5>Last name: {{ client.last_name }}</h5>
+            <hr class="testhr">
+            <h5>Phone: {{ client.phone }}</h5>
+            <hr class="testhr">
+            <h5>Email: {{ client.email }}</h5>
+            <hr class="testhr">
+            <h5>Credit score: {{ client.credit_score }}</h5>
+            <hr class="testhr">
+            <h5>Desired funding: {{ client.desired_funding }}</h5>
+            <hr class="testhr">
+            <h5>Signup date: {{ client.signup_date }}</h5>
         </div>
 
         <div class="content">
@@ -200,6 +201,7 @@
                             <div class="header">
                                 <h4 class="title">Interaction History</h4>
                                 <div style="margin-top: 10px;">
+                                <!-- {{ interact_btn.add_btn() }} -->
                                 <a href="{{ url_for('add_interaction', client_id=client.id) }}">Add Interaction</a>
                                 </div>
                             </div>
@@ -234,13 +236,10 @@
         <footer class="footer">
             
         </footer>
-
     </div>
 </div>
 
-
 </body>
-
     <!--   Core JS Files   -->
     <script src="static/js/admin/jquery.3.2.1.min.js" type="text/javascript"></script>
 	<script src="static/js/admin/bootstrap.min.js" type="text/javascript"></script>
@@ -253,6 +252,4 @@
 
     <!-- Light Bootstrap Table Core javascript and methods for Demo purpose -->
 	<script src="static/js/admin/light-bootstrap-dashboard.js?v=1.4.0"></script>
-
-
 </html>

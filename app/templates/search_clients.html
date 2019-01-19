@@ -197,6 +197,7 @@
                                         <th>ID</th>
                                         <th>First</th>
                                     	<th>Last</th>
+                                        <th>Status</th>
                                     	<th>Phone</th>
                                     	<th>Email</th>
                                     	<th>Credit Score</th>
@@ -209,11 +210,14 @@
                                             <td>{{ result.id }}</td>
                                         	<td>{{ result.first_name }}</td>
                                         	<td>{{ result.last_name }}</td>
+                                            <td>{{ result.status }}</td>
                                         	<td>{{ result.phone }}</td>
                                         	<td>{{ result.email }}</td>
                                         	<td>{{ result.credit_score }}</td>
                                             <td>{{ result.desired_funding }}</td>
-                                            <!-- <td><a href="{{ url_for('view_client') }}">Go To</a></td> -->
+                                            <td>
+                                                <a href="{{ url_for('view_client', client_id=result.id) }}">Go To</a>
+                                            </td>
                                         </tr>
                                         {% endfor %}
                                     </tbody>

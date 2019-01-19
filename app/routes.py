@@ -10,7 +10,6 @@ from sqlalchemy import desc
 from flask_mail import Message 
 from ToolsClass.tools import MyTools
 import sqlalchemy
-from sqlalchemy import func, distinct, extract
 
 
 my_tools = MyTools()
@@ -302,6 +301,11 @@ def view_client():
 	client_result = ''
 	interaction_results = ['']
 
+	client_id = request.args.get('client_id')
+	if client_id:
+		client_result = Client.query.filter_by(id=client_id).first()
+		interaction_results = Interaction.query.filter_by(client_id=client_id).all()
+
 	if client_search.validate_on_submit():
 		client_result = Client.query.filter_by(id=client_search.id_in.data).first()
 		interaction_results = Interaction.query.filter_by(client_id=client_search.id_in.data).all()
@@ -361,6 +365,21 @@ def delete_appt():
 	except Exception as e:
 		return jsonify("Fail")
 
+@app.route('/test_run', methods=['GET', 'POST'])
+@login_required
+def test_func():
+	client_search = SendAgreementSearch()
+	interact_btn = PreInteractButton()
+	client_result = ''
+	interaction_results = ['']
+
+	# client_id = request.args.get('clientId')
+	# client_id = request.args.get('row_index', None)
+	return render_template('specific_client.html', client_search=client_search, 
+							client=client_result, interactions=interaction_results, 
+							interact_btn=interact_btn, client_id=client_id)
+	
+
 @app.route('/data', methods=['GET', 'POST'])
 @login_required
 def our_data():
@@ -405,3 +424,5 @@ def our_data():
 	
 	return render_template('data.html', marketers=marketers, data_form=data_form, 
 						   num_of_clients=num_of_clients)
+
+
