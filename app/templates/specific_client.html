@@ -2,14 +2,12 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8" />
-	<link rel="icon" type="image/png" href="static/img/admin/favicon.ico">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 
 	<title>JMR Funding</title>
 
 	<meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport' />
     <meta name="viewport" content="width=device-width" />
-
 
     <!-- Bootstrap core CSS     -->
     <link href="static/css/admin/bootstrap.min.css" rel="stylesheet" />
@@ -20,20 +18,82 @@
     <!--  Light Bootstrap Table core CSS    -->
     <link href="static/css/admin/light-bootstrap-dashboard.css?v=1.4.0" rel="stylesheet"/>
 
-
-    <!--  CSS for Demo Purpose, don't include it in your project     -->
-    <link href="static/css/admin/demo.css" rel="stylesheet" />
-
-
     <!--     Fonts and icons     -->
     <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
     <link href='http://fonts.googleapis.com/css?family=Roboto:400,700,300' rel='stylesheet' type='text/css'>
-    <link href="static/css/admin/pe-icon-7-stroke.css" rel="stylesheet" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript">
+        function updateClientStatus() {
+            var clientId = '{{ client.id }}';
+            var statusOptionsElem = document.getElementById("statusOptions");
+            var statusTo = statusOptionsElem.options[statusOptionsElem.selectedIndex].value;
+            
+            $.ajax({
+                type: 'POST',
+                url: '{{ url_for("update_client_status") }}',
+                data: JSON.stringify({ 
+                    'statusTo': statusTo, 
+                    'clientId': clientId
+                }),
+                dataType: "json",
+                contentType: 'application/json',
+                success: function(data) {
+                    alert(data);
+                    // window.location.reload(true);
+                }, 
+                error: function() {
+                    alert("Fail");
+                }
+            });
+        }
+    </script>
+    <script type="text/javascript">
+        function createAppointment() {
+            var clientId = '{{ client.id }}';
+            var yearMenuElem = document.getElementById("yearMenu");
+            var monthMenuElem = document.getElementById("monthMenu");
+            var dayMenuElem = document.getElementById("dayMenu");
+            var hourMenuElem = document.getElementById("hourMenu");
+            var minuteMenuElem = document.getElementById("minuteMenu");
+            var ampmMenuElem = document.getElementById("ampmMenu");
+            var apptNotes = document.getElementById("apptNotes").value;
+            var year = yearMenuElem.options[yearMenuElem.selectedIndex].value;
+            var month = monthMenuElem.options[monthMenuElem.selectedIndex].value;
+            var day = dayMenuElem.options[dayMenuElem.selectedIndex].value;
+            var hour = hourMenuElem.options[hourMenuElem.selectedIndex].value;
+            var minute = minuteMenuElem.options[minuteMenuElem.selectedIndex].value;
+            var ampm = ampmMenuElem.options[ampmMenuElem.selectedIndex].value;
+            var apptDate = year + '-' + month + '-' + day;
+            var apptTime = hour + ':' + minute + ' ' + ampm;
+
+            if (confirm('Are you sure you want to set an appointment for ' + apptDate + ' at ' + apptTime + '?') == true) {
+                $.ajax({
+                    type: 'POST',
+                    url: '{{ url_for("create_appt_process") }}',
+                    data: JSON.stringify({
+                        'clientId': clientId,
+                        'apptDate': apptDate,
+                        'apptTime': apptTime,
+                        'apptNotes': apptNotes
+                    }), 
+                    dataType: 'json', 
+                    contentType: 'application/json', 
+                    success: function(data) {
+                    alert(data);
+                    }, 
+                    error: function() {
+                        alert("AJAX Fail");
+                    }
+                });
+            }
+        }
+    </script>
+
 </head>
 <body>
 
 <div class="wrapper">
-    <div class="sidebar" data-color="blue" data-image="static/img/admin/sidebar-5.jpg">
+    <div class="sidebar" data-color="blue">
 
     <!--   you can change the color of the sidebar using: data-color="blue | azure | green | orange | red | purple" -->
 
@@ -128,7 +188,7 @@
 
                     <ul class="nav navbar-nav navbar-right">
                         
-                        <li class="dropdown">
+                        <!-- <li class="dropdown">
                               <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                                     <p>
 										CLIENT OPTIONS
@@ -139,13 +199,13 @@
                               <ul class="dropdown-menu">
                                 <li><a href="{{ url_for('search_clients') }}">Search Clients</a></li>
                                 <li><a href="#">Edit Specific Client</a></li>
-                                <!-- <li><a href="#">ReservedForFutureUse</a></li>
                                 <li><a href="#">ReservedForFutureUse</a></li>
-                                <li><a href="#">ReservedForFutureUse</a></li> -->
-                                <!-- <li class="divider"></li>
-                                <li><a href="#">ReservedForFutureUse</a></li> -->
+                                <li><a href="#">ReservedForFutureUse</a></li>
+                                <li><a href="#">ReservedForFutureUse</a></li>
+                                <li class="divider"></li>
+                                <li><a href="#">ReservedForFutureUse</a></li>
                               </ul>
-                        </li>
+                        </li> -->
                         <li>
                             <a href="{{ url_for('logout') }}">
                                 <p>Log out</p>
@@ -168,29 +228,162 @@
         {% endwith %}
 
         <div style="margin-left: 40px;">
-            <div>
-                <div style="margin-bottom: 50px;">
-                    <h1>View Client</h1>
-                </div>
-            </div>
-            
-            <h3>{{ client.first_name }} {{ client.last_name }}</h3>
-            <h3 style="color: green;"><b>Current Status: {{ client.status }}</b></h3>
+            <h1>{{ client.first_name }} {{ client.last_name }}</h1>
+            <h3 style="color: #16a6bc;"><b>Current Status: {{ client.status }}</b></h3>
             <div>
                 <div style="float: left; margin-right: 200px;">
                     <h5>ID: {{ client.id }}</h5>
-                    <h5>First name: {{ client.first_name }}</h5>
-                    <h5>Last name: {{ client.last_name }}</h5>
-                    <h5>Desired funding: {{ client.desired_funding }}</h5>
-                </div>
-                <div style="float: left;">
                     <h5>Phone: {{ client.phone }}</h5>
                     <h5>Email: {{ client.email }}</h5>
+                </div>
+                <div style="float: left; margin-bottom: 20px;">
+                    <h5>Desired funding: {{ client.desired_funding }}</h5>
                     <h5>Credit score: {{ client.credit_score }}</h5>
                     <h5>Signup date: {{ client.signup_date }}</h5>
                 </div>
             </div>
         </div>
+
+        <hr class="myhr">
+
+        <div>
+            <div style="margin-left: 40px; margin-bottom: 30px;">
+                <h2>Change Status</h2>
+            </div>
+            <div style="margin-left: 50px; margin-bottom: 40px;">
+                <form action="" method="post" novalidate>
+                    <p>Status: <select id="statusOptions">
+                                   <option value="Contract Sent">Contract Sent</option>
+                                   <option value="Underwriting">Underwriting</option>
+                                   <option value="Approved">Approved</option>
+                                   <option value="Pulling Credit">Pulling Credit</option>
+                                   <option value="Contracted">Contracted</option>
+                                   <option value="Apps">Apps</option>
+                                   <option value="Liquidation">Liquidation</option>
+                                   <option value="Complete">Complete</option>
+                                   <option value="Declined">Declined</option>
+                               </select>
+                    <button onclick="updateClientStatus()">Submit Status Change</button></p>
+                </form>
+            </div>
+        </div>
+
+        <hr class="myhr">
+
+        <div>
+            <div style="margin-left: 40px; margin-bottom: 30px;">
+                <h2>Create Appointment</h2>
+            </div>
+            <div style="margin-left: 50px; margin-bottom: 40px;">
+                <form action="" method="post" novalidate>
+                    <p style="margin-bottom: 20px;">Year: <select id="yearMenu">
+                            <option value="{{ yearsList[0] }}">{{ yearsList[0] }}</option>
+                            <option value="{{ yearsList[1] }}">{{ yearsList[1] }}</option>
+                            <option value="{{ yearsList[2] }}">{{ yearsList[2] }}</option>
+                            <option value="{{ yearsList[3] }}">{{ yearsList[3] }}</option>
+                            <option value="{{ yearsList[4] }}">{{ yearsList[4] }}</option>
+                            <option value="{{ yearsList[5] }}">{{ yearsList[5] }}</option>
+                        </select> Month:  
+                        <select id="monthMenu">
+                            <option value="01">01</option>
+                            <option value="02">02</option>
+                            <option value="03">03</option>
+                            <option value="04">04</option>
+                            <option value="05">05</option>
+                            <option value="06">06</option>
+                            <option value="07">07</option>
+                            <option value="08">08</option>
+                            <option value="09">09</option>
+                            <option value="10">10</option>
+                            <option value="11">11</option>
+                            <option value="12">12</option>
+                        </select> Day:  
+                        <select id="dayMenu">
+                            <option value="01">01</option>
+                            <option value="02">02</option>
+                            <option value="03">03</option>
+                            <option value="04">04</option>
+                            <option value="05">05</option>
+                            <option value="06">06</option>
+                            <option value="07">07</option>
+                            <option value="08">08</option>
+                            <option value="09">09</option>
+                            <option value="10">10</option>
+                            <option value="11">11</option>
+                            <option value="12">12</option>
+                            <option value="13">13</option>
+                            <option value="14">14</option>
+                            <option value="15">15</option>
+                            <option value="16">16</option>
+                            <option value="17">17</option>
+                            <option value="18">18</option>
+                            <option value="19">19</option>
+                            <option value="20">20</option>
+                            <option value="21">21</option>
+                            <option value="22">22</option>
+                            <option value="23">23</option>
+                            <option value="24">24</option>
+                            <option value="25">25</option>
+                            <option value="26">26</option>
+                            <option value="27">27</option>
+                            <option value="28">28</option>
+                            <option value="29">29</option>
+                            <option value="30">30</option>
+                            <option value="31">31</option>
+                        </select>
+                    </p>
+                    <p style="margin-bottom: 20px;">Hour:  <select id="hourMenu">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                                <option value="9">9</option>
+                                <option value="10">10</option>
+                                <option value="11">11</option>
+                                <option value="12">12</option>
+                            </select> Minute:  
+                            <select id="minuteMenu">
+                                <option value="00">00</option>
+                                <option value="05">05</option>
+                                <option value="10">10</option>
+                                <option value="15">15</option>
+                                <option value="20">20</option>
+                                <option value="25">25</option>
+                                <option value="30">30</option>
+                                <option value="35">35</option>
+                                <option value="40">40</option>
+                                <option value="45">45</option>
+                                <option value="50">50</option>
+                                <option value="55">55</option>
+                            </select> 
+                            <select id="ampmMenu">
+                                <option value="AM">AM</option>
+                                <option value="PM">PM</option>
+                            </select></p>
+                    <p>Notes:  <input id="apptNotes" type="text" name="notes" size="35"> <button onclick="createAppointment()">Create Appointment</button></p>
+                </form>
+            </div>
+        </div>
+
+        <hr class="myhr">
+
+        <div>
+            <div style="margin-left: 40px;">
+                <h2>Add Note</h2>
+            </div>
+            <div style="margin-left: 50px; margin-bottom: 40px;">
+                <form action="" method="post" novalidate>
+                    <p><input type="text" name="addNote" size="50">
+                    <button onclick="">Add Note</button></p>
+                </form>
+            </div>
+        </div>
+
+        <hr class="myhr">
 
         <div class="content">
             <div class="container-fluid">
@@ -240,19 +433,16 @@
 
 
 </body>
+    
 
     <!--   Core JS Files   -->
     <script src="static/js/admin/jquery.3.2.1.min.js" type="text/javascript"></script>
 	<script src="static/js/admin/bootstrap.min.js" type="text/javascript"></script>
-
-	<!--  Charts Plugin -->
-	<script src="static/js/admin/chartist.min.js"></script>
 
     <!--  Notifications Plugin    -->
     <script src="static/js/admin/bootstrap-notify.js"></script>
 
     <!-- Light Bootstrap Table Core javascript and methods for Demo purpose -->
 	<script src="static/js/admin/light-bootstrap-dashboard.js?v=1.4.0"></script>
-
 
 </html>

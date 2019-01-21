@@ -107,21 +107,9 @@ h6, .h6 {
     text-transform: uppercase;
 }
 
-.testhr {
-    /*display: block;*/
-    /*position: relative;*/
-    /*float: left;*/
-    /*align-self: left;*/
-    
-    padding: 0;
-    margin: 0px;
-    height: 0;
-    width: 150px;
-    max-height: 0;
-    font-size: 1px;
-    line-height: 0;
-    /*clear: both;*/
-    /*border: none;*/
+.myhr {
+    width: 94%;
+    size: 5;
     border-top: 1px solid #2c8ba0;
     border-bottom: 1px solid #2c8ba0;
 }

@@ -1,7 +1,7 @@
-from flask import render_template, flash, redirect, url_for, request, jsonify
-from app import app, db, mail
+from flask import render_template, flash, redirect, url_for, request, jsonify, json
+from app import app, db, mail, csrf
 from app.forms import LoginForm, CreateAppointmentForm, SearchAppointmentForm, ClientForm, MessageInput, NoteInput, SearchClientForm, \
-MyAppointmentSearch, NewClientDisplayOptions, SendAgreementSearch, DataSelection, AddInteractionForm, PreInteractButton
+MyAppointmentSearch, NewClientDisplayOptions, SendAgreementSearch, DataSelection, AddInteractionForm, ClientStatusForm
 from flask_login import current_user, login_user, login_required, logout_user
 from app.models import Marketer, Appointment, Memo, Note, Client, Interaction
 from werkzeug.urls import url_parse
@@ -13,6 +13,7 @@ import sqlalchemy
 
 
 my_tools = MyTools()
+years = my_tools.get_posyears_set()
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
@@ -80,18 +81,11 @@ def manager():
 	"""
 	mssgs = db.session.query(Memo).order_by(Memo.id.desc()).limit(20)
 	notes = db.session.query(Note).order_by(Note.id.desc()).limit(20)
-	appts_query = Appointment.query.filter_by(date=str(datetime.date.today())).all()
-	results = db.session.query(Client).order_by(Client.id.desc()).filter_by(appointments=None)
-	appts = len(appts_query)
+	appts = Appointment.query.filter_by(date=str(datetime.date.today())).all()
+	new_clients = Client.query.filter_by(signup_date=str(datetime.date.today())).all()
+	num_of_appts = len(appts)
 	mssg_in = MessageInput()
 	note_in = NoteInput()
-	clients_display_form = NewClientDisplayOptions()
-	
-	if clients_display_form.validate_on_submit():
-		if clients_display_form.display_by.data == '1':
-			results = db.session.query(Client).order_by(Client.id.desc()).filter_by(appointments=None).limit(7)
-		elif clients_display_form.display_by.data == '2':
-			results = Client.query.filter_by(signup_date=str(datetime.date.today())).limit(7)
 
 	if mssg_in.validate_on_submit():
 		mssg = Memo(author=str(current_user), 
@@ -108,8 +102,8 @@ def manager():
 		db.session.commit()
 
 	return render_template('dashboard.html', mssg_in=mssg_in, mssgs=mssgs, 
-						   note_in=note_in, notes=notes, appts=appts,
-						   results=results, clients_display_form=clients_display_form)
+						   note_in=note_in, notes=notes, appts=num_of_appts,
+						   new_clients=new_clients)
 
 @app.route('/my-appts', methods=['GET', 'POST'])
 @login_required
@@ -245,6 +239,28 @@ def search_clients():
 				client_results = Client.query.filter_by(id=form.search_field.data).all()
 			else:
 				flash("Enter only numbers")
+		elif selection == '4':
+			client_results = db.session.query(Client).order_by(Client.id.desc()).filter_by(appointments=None).all()
+		elif selection == '5':
+			client_results = Client.query.filter_by(signup_date=str(datetime.date.today())).all()
+		elif selection == '6':
+			client_results = Client.query.filter_by(status='Contract Sent').all()
+		elif selection == '7':
+			client_results = Client.query.filter_by(status='Underwriting').all()
+		elif selection == '8':
+			client_results = Client.query.filter_by(status='Approved').all()
+		elif selection == '9':
+			client_results = Client.query.filter_by(status='Pulling Credit').all()
+		elif selection == '10':
+			client_results = Client.query.filter_by(status='Contracted').all()
+		elif selection == '11':
+			client_results = Client.query.filter_by(status='Apps').all()
+		elif selection == '12':
+			client_results = Client.query.filter_by(status='Liquidation').all()
+		elif selection == '13':
+			client_results = Client.query.filter_by(status='Complete').all()
+		elif selection == '14':
+			client_results = Client.query.filter_by(status='Declined').all()
 
 	return render_template('search_clients.html', client_results=client_results, form=form)
 
@@ -288,31 +304,80 @@ def email_process():
 	except Exception as e:
 		return jsonify("ERROR. EMAIL FAILED TO SEND TO " + email)
 
+@csrf.exempt
 @app.route('/view_client', methods=['GET', 'POST'])
 @login_required
 def view_client():
 	"""
-	This allows user to view a specific client in more detail, the client ID is used to
-	search. They can add interactions when a specific user is pulled up. This is done 
-	from the HTML file.
+	Detailed view of client. Can change status here. Status change is done through AJAX, look 
+	in HTML file. Route that gets activated is update_client().
 	"""
-	client_search = SendAgreementSearch()
-	interact_btn = PreInteractButton()
-	client_result = ''
-	interaction_results = ['']
-
 	client_id = request.args.get('client_id')
-	if client_id:
-		client_result = Client.query.filter_by(id=client_id).first()
-		interaction_results = Interaction.query.filter_by(client_id=client_id).all()
+	client_result = Client.query.filter_by(id=client_id).first()
+	interaction_results = db.session.query(Interaction).filter_by(client_id=client_id)[:-30:-1]
+	return render_template('specific_client.html', client=client_result, 
+						   interactions=interaction_results, yearsList = years)
 
-	if client_search.validate_on_submit():
-		client_result = Client.query.filter_by(id=client_search.id_in.data).first()
-		interaction_results = Interaction.query.filter_by(client_id=client_search.id_in.data).all()
+@csrf.exempt
+@app.route('/update_client_status', methods=['GET', 'POST'])
+@login_required
+def update_client_status():
+	if request.method == 'POST':
+		try:
+			data = request.get_json()
+			status_to = data['statusTo']
+			client_id = data['clientId']
 
-	return render_template('specific_client.html', client_search=client_search, 
-							client=client_result, interactions=interaction_results, 
-							interact_btn=interact_btn)
+			client = Client.query.filter_by(id=client_id).first()
+			client.status = status_to
+			interaction = Interaction(client_id=client_id,
+		 							  marketer=str(current_user),
+		 							  date=my_tools.get_current_date(),
+		 							  time=my_tools.get_current_time(),
+								      type_of='Status Change',
+									  about='Changed status to ' + status_to)
+			db.session.add(interaction)
+			db.session.commit()
+
+			return jsonify("Status successfully changed")
+		except Exception as e:
+			return jsonify("Unsuccessful")
+
+@csrf.exempt
+@app.route('/create_appt_process', methods=['GET', 'POST'])
+@login_required
+def create_appt_process():
+	if request.method == 'POST':
+		try:
+			data = request.get_json()
+			client_id = data['clientId']
+			appt_date = data['apptDate']
+			appt_time = data['apptTime']
+			appt_notes = data['apptNotes']
+			date_obj = datetime.datetime.strptime(appt_date, '%Y-%m-%d').date()
+
+			client = Client.query.filter_by(id=client_id).first()
+			appointment = Appointment(client_first=client.first_name, 
+									  client_last=client.last_name, 
+									  date=date_obj, 
+									  time=appt_time, 
+									  notes=appt_notes, 
+									  creator=current_user, 
+									  client=client)
+			interaction = Interaction(client_id=client_id,
+		 							  marketer=str(current_user),
+		 							  date=my_tools.get_current_date(),
+		 							  time=my_tools.get_current_time(),
+								      type_of='Appointment Created',
+									  about=appt_notes)
+			db.session.add(appointment)
+			db.session.add(interaction)
+			db.session.commit()
+
+			return jsonify("Appointment successfully created")
+		except Exception as e:
+			return jsonify("Unsuccessful")
+
 
 @app.route('/add_interact', methods=['GET', 'POST'])
 @login_required
@@ -364,22 +429,7 @@ def delete_appt():
 			return jsonify("Appointment does not exist, or was not able to be deleted.")
 	except Exception as e:
 		return jsonify("Fail")
-
-@app.route('/test_run', methods=['GET', 'POST'])
-@login_required
-def test_func():
-	client_search = SendAgreementSearch()
-	interact_btn = PreInteractButton()
-	client_result = ''
-	interaction_results = ['']
-
-	# client_id = request.args.get('clientId')
-	# client_id = request.args.get('row_index', None)
-	return render_template('specific_client.html', client_search=client_search, 
-							client=client_result, interactions=interaction_results, 
-							interact_btn=interact_btn, client_id=client_id)
 	
-
 @app.route('/data', methods=['GET', 'POST'])
 @login_required
 def our_data():

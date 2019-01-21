@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8" />
-	<link rel="icon" type="image/png" href="static/img/admin/favicon.ico">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 
 	<title>JMR Funding</title>
@@ -20,20 +19,14 @@
     <!--  Light Bootstrap Table core CSS    -->
     <link href="static/css/admin/light-bootstrap-dashboard.css?v=1.4.0" rel="stylesheet"/>
 
-
-    <!--  CSS for Demo Purpose, don't include it in your project     -->
-    <link href="static/css/admin/demo.css" rel="stylesheet" />
-
-
     <!--     Fonts and icons     -->
     <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
     <link href='http://fonts.googleapis.com/css?family=Roboto:400,700,300' rel='stylesheet' type='text/css'>
-    <link href="static/css/admin/pe-icon-7-stroke.css" rel="stylesheet" />
 </head>
 <body>
 
 <div class="wrapper">
-    <div class="sidebar" data-color="blue" data-image="static/img/admin/sidebar-5.jpg">
+    <div class="sidebar" data-color="blue">
 
     <!--   you can change the color of the sidebar using: data-color="blue | azure | green | orange | red | purple" -->
 
@@ -128,7 +121,7 @@
 
                     <ul class="nav navbar-nav navbar-right">
                         
-                        <li class="dropdown">
+                        <!-- <li class="dropdown">
                               <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                                     <p>
 										CLIENT OPTIONS
@@ -139,13 +132,13 @@
                               <ul class="dropdown-menu">
                                 <li><a href="{{ url_for('view_client') }}">View Specific Client</a></li>
                                 <li><a href="#">Edit Specific Client</a></li>
-                                <!-- <li><a href="#">ReservedForFutureUse</a></li>
+                                <li><a href="#">ReservedForFutureUse</a></li>
                                 <li><a href="#">ReservedForFutureUse</a></li>
                                 <li><a href="#">ReservedForFutureUse</a></li>
                                 <li class="divider"></li>
-                                <li><a href="#">ReservedForFutureUse</a></li> -->
+                                <li><a href="#">ReservedForFutureUse</a></li>
                               </ul>
-                        </li>
+                        </li> -->
                         <li>
                             <a href="{{ url_for('logout') }}">
                                 <p>Log out</p>
@@ -202,7 +195,6 @@
                                     	<th>Email</th>
                                     	<th>Credit Score</th>
                                         <th>Desired Funding</th>
-                                        <!-- <th>View/Edit</th> -->
                                     </thead>
                                     <tbody>
                                         {% for result in client_results %}

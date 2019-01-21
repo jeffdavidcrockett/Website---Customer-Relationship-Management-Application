@@ -42,6 +42,7 @@ minutes = [('00', '00'), ('05', '05'), ('10', '10'), ('15', '15'),
 
 ampm = [('AM', 'AM'), ('PM', 'PM')]
 
+
 class ClientForm(FlaskForm):
 	credit_menu = [('720+', '720+'), 
 				   ('680 - 719', '680 - 719'), 
@@ -104,11 +105,22 @@ class MyAppointmentSearch(FlaskForm):
 
 
 class SearchClientForm(FlaskForm):
-	search_menu = [('1', 'First name'),
-				   ('2', 'Last name'),
-				   ('3', 'ID')]
+	search_menu = [('1', 'First name (Input Rqrd)'),
+				   ('2', 'Last name (Input Rqrd)'),
+				   ('3', 'ID (Input Rqrd)'), 
+				   ('4', 'Uncontacted'), 
+				   ('5', 'Today'), 
+				   ('6', 'Contract Sent'), 
+				   ('7', 'Underwriting'),
+				   ('8', 'Approved'), 
+				   ('9', 'Pulling Credit'), 
+				   ('10', 'Contracted'), 
+				   ('11', 'Apps'), 
+				   ('12', 'Liquidation'), 
+				   ('13', 'Complete'), 
+				   ('14', 'Declined')]
 	search_by = SelectField('Filter by', choices=search_menu, default=1)
-	search_field = StringField('Input', validators=[DataRequired()])
+	search_field = StringField('Input')
 	search = SubmitField('Search')
 
 
@@ -161,3 +173,13 @@ class AddInteractionForm(FlaskForm):
 	choices_menu = SelectField('Interaction Type', choices=choices, default=1)
 	details = StringField('Details', validators=[DataRequired()])
 	submit = SubmitField('Submit')
+
+
+class ClientStatusForm(FlaskForm):
+	choices = [('Contract Sent', 'Contract Sent'), 
+			   ('Underwriting', 'Underwriting'), 
+			   ('Approved', 'Approved')]
+
+	status_menu = SelectField('Status', choices=choices, default='Contract Sent')
+	why = StringField('Why', validators=[DataRequired()])
+	submit = SubmitField('Submit Status Change')

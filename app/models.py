@@ -61,12 +61,12 @@ class Note(db.Model):
 
 class Interaction(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
-	client_id = db.Column(db.Integer, index=True)
-	marketer = db.Column(db.String(30), index=True)
-	date = db.Column(db.String(10), index=True)
-	time = db.Column(db.String(30), index=True)
-	type_of = db.Column(db.String(30), index=True)
-	about = db.Column(db.String(140), index=True)
+	client_id = db.Column(db.Integer)
+	marketer = db.Column(db.String(30))
+	date = db.Column(db.String(10))
+	time = db.Column(db.String(30))
+	type_of = db.Column(db.String(30))
+	about = db.Column(db.String(140))
 
 
 @login.user_loader
