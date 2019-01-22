@@ -532,6 +532,11 @@ input:focus {
     min-height: calc(100% - 123px);
 }
 
+.main-panel > .content-cust {
+    padding: 10px 15px;
+    min-height: calc(100% - 123px);
+}
+
 .main-panel > .footer {
     border-top: 1px solid #e7e7e7;
 }

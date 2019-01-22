@@ -69,6 +69,13 @@ class Interaction(db.Model):
 	about = db.Column(db.String(140))
 
 
+class ClientNote(db.Model):
+	id = db.Column(db.Integer, primary_key=True)
+	client_id = db.Column(db.Integer)
+	marketer = db.Column(db.String(30))
+	body = db.Column(db.String(140))
+
+
 @login.user_loader
 def load_user(id):
 	return Marketer.query.get(int(id))

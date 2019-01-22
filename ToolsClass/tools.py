@@ -3,6 +3,7 @@ from datetime import date
 import calendar
 import pytz
 
+
 class MyTools:
     def get_current_year(self):
         """
@@ -28,6 +29,14 @@ class MyTools:
         Returns the current date formatted as year-month-day.
         """
         return datetime.datetime.today().strftime('%Y-%m-%d')
+
+    def get_currentpretty_date(self):
+        month = self.get_current_month()
+        day = self.get_current_day()
+        year = self.get_current_year()
+        month_str = calendar.month_name[month]
+
+        return month_str + ' ' + str(day) + ', ' + str(year)
 
     def get_endof_week(self):
         """

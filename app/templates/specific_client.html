@@ -88,6 +88,31 @@
             }
         }
     </script>
+    <script type="text/javascript">
+        function createClientNote() {
+            var clientId = '{{ client.id }}';
+            var noteContents = document.getElementById("clientNoteInput").value;
+
+            if (confirm("Are you sure you want to create a new note for this client?") == true) {
+                $.ajax({
+                    type: 'POST', 
+                    url: '{{ url_for("create_client_note") }}',
+                    data: JSON.stringify({
+                        'clientId': clientId, 
+                        'noteContents': noteContents
+                    }), 
+                    dataType: 'json', 
+                    contentType: 'application/json', 
+                    success: function(data) {
+                        alert(data);
+                    }, 
+                    error: function() {
+                        alert("AJAX Fail");
+                    }
+                });
+            }
+        }
+    </script>
 
 </head>
 <body>
@@ -150,22 +175,22 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="#">View Client</a>
+                    <a class="navbar-brand" href="#">Client View</a>
                 </div>
                 <div class="collapse navbar-collapse">
                     <ul class="nav navbar-nav navbar-left">
-                        <li>
+                        <!-- <li>
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                                 <i class="fa fa-dashboard"></i>
 								<p class="hidden-lg hidden-md">Dashboard</p>
                             </a>
-                        </li>
-                        <li class="dropdown">
+                        </li> -->
+                        <!-- <li class="dropdown">
                               <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                                     <i class="fa fa-globe"></i>
-                                    <b class="caret hidden-sm hidden-xs"></b>
+                                    <b class="caret hidden-sm hidden-xs"></b> -->
                                     <!-- <span class="notification hidden-sm hidden-xs">5</span> -->
-									<p class="hidden-lg hidden-md">
+									<!-- <p class="hidden-lg hidden-md">
 										5 Notifications
 										<b class="caret"></b>
 									</p>
@@ -177,13 +202,13 @@
                                 <li><a href="#">ReservedForFutureUse</a></li>
                                 <li><a href="#">ReservedForFutureUse</a></li>
                               </ul>
-                        </li>
-                        <li>
+                        </li> -->
+                        <!-- <li>
                            <a href="">
                                 <i class="fa fa-search"></i>
 								<p class="hidden-lg hidden-md">Search</p>
                             </a>
-                        </li>
+                        </li> -->
                     </ul>
 
                     <ul class="nav navbar-nav navbar-right">
@@ -206,6 +231,7 @@
                                 <li><a href="#">ReservedForFutureUse</a></li>
                               </ul>
                         </li> -->
+                        <a class="navbar-brand" style="font-size: 15px; margin-left: 30px;" href="#">{{ pretty_date }}</a>
                         <li>
                             <a href="{{ url_for('logout') }}">
                                 <p>Log out</p>
@@ -364,7 +390,7 @@
                                 <option value="AM">AM</option>
                                 <option value="PM">PM</option>
                             </select></p>
-                    <p>Notes:  <input id="apptNotes" type="text" name="notes" size="35"> <button onclick="createAppointment()">Create Appointment</button></p>
+                    <p><input id="apptNotes" type="text" name="notes" size="35" placeholder="Appointment Notes"> <button onclick="createAppointment()">Create Appointment</button></p>
                 </form>
             </div>
         </div>
@@ -373,19 +399,19 @@
 
         <div>
             <div style="margin-left: 40px;">
-                <h2>Add Note</h2>
+                <h2>General Note</h2>
             </div>
             <div style="margin-left: 50px; margin-bottom: 40px;">
                 <form action="" method="post" novalidate>
-                    <p><input type="text" name="addNote" size="50">
-                    <button onclick="">Add Note</button></p>
+                    <p><input id="clientNoteInput" type="text" name="addNote" size="50">
+                    <button onclick="createClientNote()">Add Note</button></p>
                 </form>
             </div>
         </div>
 
         <hr class="myhr">
 
-        <div class="content">
+        <div class="content-cust">
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-md-12">
@@ -413,6 +439,39 @@
                                         	<td>{{ result.time }}</td>
                                         	<td>{{ result.type_of }}</td>
                                         	<td>{{ result.about }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-cust">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card" style="height: 600px; overflow: auto;">
+                            <div class="header">
+                                <h4 class="title">Client Notes</h4>
+                                <!-- <div style="margin-top: 10px;">
+                                <a href="{{ url_for('add_interaction', client_id=client.id) }}">Add Interaction</a>
+                                </div> -->
+                            </div>
+                            <div class="content table-responsive table-full-width">
+                                <table class="table table-hover table-striped">
+                                    <thead>
+                                        <th>Marketer</th>
+                                        <th>Note Body</th>
+                                    </thead>
+                                    <tbody>
+                                        {% for note in notes %}
+                                        <tr>
+                                            <td>{{ note.marketer }}</td>
+                                            <td>{{ note.body }}</td>
                                         </tr>
                                         {% endfor %}
                                     </tbody>

@@ -3,7 +3,7 @@ from app import app, db, mail, csrf
 from app.forms import LoginForm, CreateAppointmentForm, SearchAppointmentForm, ClientForm, MessageInput, NoteInput, SearchClientForm, \
 MyAppointmentSearch, NewClientDisplayOptions, SendAgreementSearch, DataSelection, AddInteractionForm, ClientStatusForm
 from flask_login import current_user, login_user, login_required, logout_user
-from app.models import Marketer, Appointment, Memo, Note, Client, Interaction
+from app.models import Marketer, Appointment, Memo, Note, Client, Interaction, ClientNote
 from werkzeug.urls import url_parse
 import datetime
 from sqlalchemy import desc
@@ -14,6 +14,7 @@ import sqlalchemy
 
 my_tools = MyTools()
 years = my_tools.get_posyears_set()
+pretty_date = my_tools.get_currentpretty_date()
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
@@ -103,7 +104,7 @@ def manager():
 
 	return render_template('dashboard.html', mssg_in=mssg_in, mssgs=mssgs, 
 						   note_in=note_in, notes=notes, appts=num_of_appts,
-						   new_clients=new_clients)
+						   new_clients=new_clients, pretty_date=pretty_date)
 
 @app.route('/my-appts', methods=['GET', 'POST'])
 @login_required
@@ -131,7 +132,7 @@ def my_appts():
 		else:
 			return redirect(url_for('my_appts'))
 
-	return render_template('my_appts.html', form=form, appointments=appointments)
+	return render_template('my_appts.html', form=form, appointments=appointments, pretty_date=pretty_date)
 
 @app.route('/createappt', methods=['GET', 'POST'])
 @login_required
@@ -177,7 +178,7 @@ def create_appt():
 
 		return redirect(url_for('create_appt'))
 
-	return render_template('create_appt.html', create_form=create_form)
+	return render_template('create_appt.html', create_form=create_form, pretty_date=pretty_date)
 
 @app.route('/search-appt', methods=['GET', 'POST'])
 @login_required
@@ -216,7 +217,7 @@ def search_appt():
 		elif selection == '4':
 			appt_results = Appointment.query.filter_by(date=form.search_field.data).all()
 
-	return render_template('search_appt.html', results=appt_results, form=form)
+	return render_template('search_appt.html', results=appt_results, form=form, pretty_date=pretty_date)
 
 @app.route('/search-clients', methods=['GET', 'POST'])
 @login_required
@@ -262,7 +263,8 @@ def search_clients():
 		elif selection == '14':
 			client_results = Client.query.filter_by(status='Declined').all()
 
-	return render_template('search_clients.html', client_results=client_results, form=form)
+	return render_template('search_clients.html', client_results=client_results, form=form, 
+						   pretty_date=pretty_date)
 
 @app.route('/send-agreement', methods=['GET', 'POST'])
 @login_required
@@ -284,7 +286,7 @@ def send_agreement():
 			flash('No client found with that ID')
 
 	return render_template('send_agreement.html', search_form=search_form, 
-						   client=client_result, email=email)
+						   client=client_result, email=email, pretty_date=pretty_date)
 
 @app.route('/email_process', methods=['GET', 'POST'])
 @login_required
@@ -315,8 +317,11 @@ def view_client():
 	client_id = request.args.get('client_id')
 	client_result = Client.query.filter_by(id=client_id).first()
 	interaction_results = db.session.query(Interaction).filter_by(client_id=client_id)[:-30:-1]
+	note_results = db.session.query(ClientNote).filter_by(client_id=client_id)[:-30:-1]
+
 	return render_template('specific_client.html', client=client_result, 
-						   interactions=interaction_results, yearsList = years)
+						   interactions=interaction_results, yearsList = years, 
+						   notes=note_results, pretty_date=pretty_date)
 
 @csrf.exempt
 @app.route('/update_client_status', methods=['GET', 'POST'])
@@ -378,6 +383,25 @@ def create_appt_process():
 		except Exception as e:
 			return jsonify("Unsuccessful")
 
+@csrf.exempt
+@app.route('/create_client_note', methods=['GET', 'POST'])
+@login_required
+def create_client_note():
+	if request.method == 'POST':
+		try:
+			data = request.get_json()
+			client_id = data['clientId']
+			note_contents = data['noteContents']
+
+			note = ClientNote(client_id=client_id, 
+						      marketer=str(current_user), 
+						      body=note_contents)
+			db.session.add(note)
+			db.session.commit()
+
+			return jsonify("Successfully added note to client")
+		except Exception as e:
+			return jsonify("Unsuccessful")
 
 @app.route('/add_interact', methods=['GET', 'POST'])
 @login_required
@@ -405,7 +429,8 @@ def add_interaction(client=None):
 		db.session.commit()
 		flash("Interaction added")
 
-	return render_template('add_interact.html', client=client_result, interact_form=interact_form)
+	return render_template('add_interact.html', client=client_result, interact_form=interact_form, 
+						   pretty_date=pretty_date)
 
 @app.route('/delete_appt', methods=['GET', 'POST'])
 @login_required
@@ -456,7 +481,7 @@ def our_data():
 				num_of_clients += 1
 
 			return render_template('data.html', marketers=marketers, data_form=data_form, 
-						   num_of_clients=num_of_clients)
+						           num_of_clients=num_of_clients, pretty_date=pretty_date)
 		elif selection == '3':
 			# year = my_tools.get_current_year()
 			# # clients = db.session.query(distinct(func.date_part(year, Client.signup_date)))
@@ -473,6 +498,6 @@ def our_data():
 			return redirect(url_for('our_data'))
 	
 	return render_template('data.html', marketers=marketers, data_form=data_form, 
-						   num_of_clients=num_of_clients)
+						   num_of_clients=num_of_clients, pretty_date=pretty_date)
 
 
