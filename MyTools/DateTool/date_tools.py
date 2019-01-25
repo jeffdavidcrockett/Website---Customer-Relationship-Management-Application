@@ -4,7 +4,7 @@ import calendar
 import pytz
 
 
-class MyTools:
+class MyDateTools:
     def get_current_year(self):
         """
         Returns the current year.

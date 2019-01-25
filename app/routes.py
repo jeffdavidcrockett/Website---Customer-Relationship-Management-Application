@@ -6,41 +6,42 @@ from flask_login import current_user, login_user, login_required, logout_user
 from app.models import Marketer, Appointment, Memo, Note, Client, Interaction, ClientNote
 from werkzeug.urls import url_parse
 import datetime
-from sqlalchemy import desc
 from flask_mail import Message 
-from ToolsClass.tools import MyTools
 import sqlalchemy
+from MyTools.EmailTool.email_parser import EmailParserTool
+from MyTools.DateTool.date_tools import MyDateTools
 
 
-my_tools = MyTools()
-years = my_tools.get_posyears_set()
-pretty_date = my_tools.get_currentpretty_date()
+date_tool = MyDateTools()
+years = date_tool.get_posyears_set()
+pretty_date = date_tool.get_currentpretty_date()
 
-@app.route('/', methods=['GET', 'POST'])
-@app.route('/index', methods=['GET', 'POST'])
-@login_required
-def index():
-	"""
-	Test Client sign up page. Probably will be deleted. Client enters information 
-	and is logged into database table Client.
-	"""
-	client_form = ClientForm()
+# @app.route('/', methods=['GET', 'POST'])
+# @app.route('/index', methods=['GET', 'POST'])
+# @login_required
+# def index():
+# 	"""
+# 	Test Client sign up page. Probably will be deleted. Client enters information 
+# 	and is logged into database table Client.
+# 	"""
 
-	if client_form.validate_on_submit():
-		try:
-			client = Client(first_name=client_form.first_name.data,
-							last_name=client_form.last_name.data,
-							phone=client_form.phone.data,
-							email=client_form.email.data,
-							credit_score=client_form.credit_score.data,
-							desired_funding=client_form.desired_funding.data, 
-							signup_date=str(datetime.date.today()))
-			db.session.add(client)
-			db.session.commit()
-		except (sqlalchemy.exc.SQLAlchemyError, sqlalchemy.exc.InvalidRequestError) as e:
-			db.session.rollback()
-			return render_template('bad_email.html')
-	return render_template('clients.html', client_form=client_form)
+# 	client_form = ClientForm()
+
+# 	if client_form.validate_on_submit():
+# 		try:
+# 			client = Client(first_name=client_form.first_name.data,
+# 							last_name=client_form.last_name.data,
+# 							phone=client_form.phone.data,
+# 							email=client_form.email.data,
+# 							credit_score=client_form.credit_score.data,
+# 							desired_funding=client_form.desired_funding.data, 
+# 							signup_date=str(datetime.date.today()))
+# 			db.session.add(client)
+# 			db.session.commit()
+# 		except (sqlalchemy.exc.SQLAlchemyError, sqlalchemy.exc.InvalidRequestError) as e:
+# 			db.session.rollback()
+# 			return render_template('bad_email.html')
+# 	return render_template('clients.html', client_form=client_form)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -48,6 +49,7 @@ def login():
 	Login page for employees. If user is already logged in, they are redirected to 
 	the manager dashboard page.
 	"""
+
 	if current_user.is_authenticated:
 		return redirect(url_for('manager'))
 	form = LoginForm()
@@ -70,9 +72,11 @@ def logout():
 	"""
 	Logs the current user out and redirects to login page.
 	"""
+
 	logout_user()
 	return redirect(url_for('login'))
 
+@app.route('/', methods=['GET', 'POST'])
 @app.route('/manager', methods=['GET', 'POST'])
 @login_required
 def manager():
@@ -80,6 +84,7 @@ def manager():
 	Main dashboard page for authenticated employees. New and uncontacted clients are displayed.
 	Also, there is a global message board as well as a personal notepad.
 	"""
+
 	mssgs = db.session.query(Memo).order_by(Memo.id.desc()).limit(20)
 	notes = db.session.query(Note).order_by(Note.id.desc()).limit(20)
 	appts = Appointment.query.filter_by(date=str(datetime.date.today())).all()
@@ -106,6 +111,57 @@ def manager():
 						   note_in=note_in, notes=notes, appts=num_of_appts,
 						   new_clients=new_clients, pretty_date=pretty_date)
 
+@csrf.exempt
+@app.route('/load_client_process', methods=['GET', 'POST'])
+@login_required
+def load_client_process():
+	if request.method == 'POST':
+		try:
+			load_client = EmailParserTool()
+		    
+			try:
+				load_client.connect()
+			except Exception as e:
+				return jsonify("Email connect failure")
+			try:
+				email_ = load_client.find_clients()
+			except Exception as e:
+				return jsonify("Client find failure")
+			try:
+				client_data = load_client.parse_and_commit(email_)
+			except Exception as e:
+				return jsonify("Parse failure or No new clients")
+
+			try:
+				new_client = Client(first_name=client_data[3], last_name=client_data[4], 
+	                        		email=client_data[5], credit_score=client_data[13], 
+	                            	signup_date=date_tool.get_current_date(), 
+	                            	status='None', loan_type=client_data[0], 
+	                            	business_name=client_data[1], 
+	                            	business_class=client_data[2], 
+	                            	business_phone=client_data[6], 
+	                            	mobile_phone=client_data[7], 
+	                            	zip_code=client_data[8], 
+	                            	business_type=client_data[9], 
+	                            	loan_option=client_data[10], 
+	                            	loan_amount=client_data[11], 
+	                            	avg_monthly_income=client_data[12], 
+	                            	retirement=client_data[14], 
+	                            	company_type=client_data[15], 
+	                            	business_length=client_data[16], 
+	                            	company_website=client_data[17], 
+	                            	physical_biz_location=client_data[18], 
+	                            	business_plan=client_data[19])
+				db.session.add(new_client)
+				db.session.commit()
+			except Exception as e:
+				err_msg = str(e)
+				return jsonify(err_msg)
+
+			return jsonify("Successfully Added Client")
+		except Exception as e:
+			return jsonify("Fail")
+
 @app.route('/my-appts', methods=['GET', 'POST'])
 @login_required
 def my_appts():
@@ -115,18 +171,19 @@ def my_appts():
 	It is done through jQuery/JSON/AJAX, so look on this route's HTML page for script. The route that 
 	the AJAX activates is delete_appt(). 
 	"""
+
 	form = MyAppointmentSearch()
 	appointments = Appointment.query.filter_by(date=str(datetime.date.today())).all()
 
 	if form.validate_on_submit():
 		selection = form.filter_menu.data
 		if selection == '2':
-			current_date = my_tools.get_current_date()
-			endof_week = my_tools.get_endof_week()
+			current_date = date_tool.get_current_date()
+			endof_week = date_tool.get_endof_week()
 			appointments = db.session.query(Appointment).filter(Appointment.date.between(current_date, 
 														 endof_week)).order_by(Appointment.date.asc())
 		elif selection == '3':
-			start_date, end_date = my_tools.getcurrent_beginend_ofmonth()
+			start_date, end_date = date_tool.getcurrent_beginend_ofmonth()
 			appointments = db.session.query(Appointment).filter(Appointment.date.between(start_date, 
 														 end_date)).order_by(Appointment.date.asc())
 		else:
@@ -141,6 +198,7 @@ def create_appt():
 	User can create appointments. It will log appointments into database, as well as the 
 	interaction of 'Appointment'.
 	"""
+
 	create_form = CreateAppointmentForm()
 
 	if create_form.validate_on_submit():
@@ -162,8 +220,8 @@ def create_appt():
 								   client=client)
 				interaction = Interaction(client_id=create_form.client_id1.data,
 										  marketer=str(current_user),
-										  date=my_tools.get_current_date(),
-										  time=my_tools.get_current_time(),
+										  date=date_tool.get_current_date(),
+										  time=date_tool.get_current_time(),
 										  type_of="Appointment",
 										  about=create_form.notes.data)
 
@@ -187,6 +245,7 @@ def search_appt():
 	User can do a global search of all appointments by all users. Can search by Marketer ID, 
 	Client first, Client last, and date. Date must be formatted as example: 2019-03-05.
 	"""
+
 	form = SearchAppointmentForm()
 	appt_results = db.session.query(Appointment).order_by(Appointment.id.desc()).limit(15)
 
@@ -226,6 +285,7 @@ def search_clients():
 	Global search of all clients. Can search by client's first name, last name, and
 	client id.
 	"""
+
 	form = SearchClientForm()
 	client_results = db.session.query(Client).order_by(Client.id.desc()).limit(100)
 
@@ -274,6 +334,7 @@ def send_agreement():
 	the script at top of send_agreement.html file. The route that is activated by AJAX is 
 	email_process().
 	"""
+
 	client_result = ['']
 	email = ''
 	search_form = SendAgreementSearch()
@@ -295,6 +356,7 @@ def email_process():
 	This is the route that is activated by AJAX that comes from the send_agreement()
 	route.
 	"""
+
 	try:
 		email = request.args.get('email')
 		msg = Message("JMR Funding Contract", sender="jmrtestsend@gmail.com", recipients=[email])
@@ -314,6 +376,7 @@ def view_client():
 	Detailed view of client. Can change status here. Status change is done through AJAX, look 
 	in HTML file. Route that gets activated is update_client().
 	"""
+
 	client_id = request.args.get('client_id')
 	client_result = Client.query.filter_by(id=client_id).first()
 	interaction_results = db.session.query(Interaction).filter_by(client_id=client_id)[:-30:-1]
@@ -337,8 +400,8 @@ def update_client_status():
 			client.status = status_to
 			interaction = Interaction(client_id=client_id,
 		 							  marketer=str(current_user),
-		 							  date=my_tools.get_current_date(),
-		 							  time=my_tools.get_current_time(),
+		 							  date=date_tool.get_current_date(),
+		 							  time=date_tool.get_current_time(),
 								      type_of='Status Change',
 									  about='Changed status to ' + status_to)
 			db.session.add(interaction)
@@ -371,8 +434,8 @@ def create_appt_process():
 									  client=client)
 			interaction = Interaction(client_id=client_id,
 		 							  marketer=str(current_user),
-		 							  date=my_tools.get_current_date(),
-		 							  time=my_tools.get_current_time(),
+		 							  date=date_tool.get_current_date(),
+		 							  time=date_tool.get_current_time(),
 								      type_of='Appointment Created',
 									  about=appt_notes)
 			db.session.add(appointment)
@@ -410,6 +473,7 @@ def add_interaction(client=None):
 	Route activated from the specific_client.html file (from JSON?). Details of interaction 
 	can be added and is logged to the database in Interaction table.
 	"""
+
 	client_id = request.args.get('client_id', None)
 	client_result = Client.query.filter_by(id=client_id).first()
 	interact_form = AddInteractionForm()
@@ -439,6 +503,7 @@ def delete_appt():
 	Activated through AJAX from my_appt() route. Will *not* allow a marketer to delete 
 	other marketer's appointments, only their own.
 	"""
+
 	try:
 		appt_id = request.args.get('apptId')
 		appt = Appointment.query.filter_by(id=appt_id).first()
@@ -461,10 +526,11 @@ def our_data():
 	"""
 	Displays information gathered from database. Under construction.
 	"""
+	
 	data_form = DataSelection()
 
 	marketers = Marketer.query.all()
-	clients = db.session.query(Client).filter_by(signup_date=my_tools.get_current_date())
+	clients = db.session.query(Client).filter_by(signup_date=date_tool.get_current_date())
 
 	num_of_clients = 0
 	for c in clients:
@@ -473,7 +539,7 @@ def our_data():
 	if data_form.validate_on_submit():
 		selection = data_form.drop_menu.data
 		if selection == '2':
-			start_date, end_date = my_tools.getcurrent_beginend_ofmonth()
+			start_date, end_date = date_tool.getcurrent_beginend_ofmonth()
 			clients = db.session.query(Client).filter(Client.signup_date >= 
 													  start_date).filter(Client.signup_date <= end_date).all()
 			num_of_clients = 0
@@ -483,7 +549,7 @@ def our_data():
 			return render_template('data.html', marketers=marketers, data_form=data_form, 
 						           num_of_clients=num_of_clients, pretty_date=pretty_date)
 		elif selection == '3':
-			# year = my_tools.get_current_year()
+			# year = date_tool.get_current_year()
 			# # clients = db.session.query(distinct(func.date_part(year, Client.signup_date)))
 			# clients = Client.query.filter(Client.signup_date.ilike("%2019%")).all()
 

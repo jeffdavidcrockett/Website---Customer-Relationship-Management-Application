@@ -1,16 +1,16 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField
 from wtforms.validators import DataRequired
-from ToolsClass.tools import MyTools
+from MyTools.DateTool.date_tools import MyDateTools
 
-my_tools = MyTools()
-years = my_tools.get_posyears_set()
+date_tools = MyDateTools()
+years = date_tools.get_posyears_set()
 
-default_year = str(my_tools.get_current_year())
-default_month = str(my_tools.get_current_month())
+default_year = str(date_tools.get_current_year())
+default_month = str(date_tools.get_current_month())
 if len(default_month) == 1:
 	default_month = '0' + default_month
-default_day = str(my_tools.get_current_day())
+default_day = str(date_tools.get_current_day())
 if len(default_day) == 1:
 	default_day = '0' + default_day
 

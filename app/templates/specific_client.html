@@ -39,7 +39,6 @@
                 contentType: 'application/json',
                 success: function(data) {
                     alert(data);
-                    // window.location.reload(true);
                 }, 
                 error: function() {
                     alert("Fail");
@@ -152,7 +151,7 @@
                 <li>
                     <a href="{{ url_for('send_agreement') }}">
                         <i class="pe-7s-map-marker"></i>
-                        <p>Send Agreement Email</p>
+                        <p>Send Email</p>
                     </a>
                 </li>
                 <li>
@@ -257,15 +256,32 @@
             <h1>{{ client.first_name }} {{ client.last_name }}</h1>
             <h3 style="color: #16a6bc;"><b>Current Status: {{ client.status }}</b></h3>
             <div>
-                <div style="float: left; margin-right: 200px;">
-                    <h5>ID: {{ client.id }}</h5>
-                    <h5>Phone: {{ client.phone }}</h5>
-                    <h5>Email: {{ client.email }}</h5>
+                <div style="float: left; margin-right: 100px;">
+                    <h5><b>ID:</b> {{ client.id }}</h5>
+                    <h5><b>Mobile Phone:</b> {{ client.mobile_phone }}</h5>
+                    <h5><b>Business Phone:</b> {{ client.business_phone }}</h5>
+                    <h5><b>Email:</b> {{ client.email }}</h5>
+                    <h5><b>Zip Code:</b> {{ client.zip_code }}</h5>
+                    <h5><b>Business Name:</b> {{ client.business_name }}</h5>
+                    <h5><b>Business Class:</b> {{ client.business_class }}</h5>
+                </div>
+                <div style="float: left; margin-bottom: 20px; margin-right: 100px;">
+                    <h5><b>Desired funding:</b> {{ client.loan_amount }}</h5>
+                    <h5><b>Credit score:</b> {{ client.credit_score }}</h5>
+                    <h5><b>Signup date:</b> {{ client.signup_date }}</h5>
+                    <h5><b>Business Type:</b> {{ client.business_type }}</h5>
+                    <h5><b>Company Type:</b> {{ client.company_type }}</h5>
+                    <h5><b>Company Website?:</b> {{ client.company_website }}</h5>
+                    <h5><b>Physical Location?:</b> {{ client.physical_biz_location }}</h5>
                 </div>
                 <div style="float: left; margin-bottom: 20px;">
-                    <h5>Desired funding: {{ client.desired_funding }}</h5>
-                    <h5>Credit score: {{ client.credit_score }}</h5>
-                    <h5>Signup date: {{ client.signup_date }}</h5>
+                    <h5><b>Avg Monthly Income:</b> {{ client.avg_monthly_income }}</h5>
+                    <h5><b>Business Plan?</b> {{ client.business_plan }}</h5>
+                    <h5><b>Business length:</b> {{ client.business_length }}</h5>
+                    <h5><b>Loan Amount Goal:</b> {{ client.loan_amount }}</h5>
+                    <h5><b>Loan Option:</b> {{ client.loan_option }}</h5>
+                    <h5><b>Loan Type:</b> {{ client.loan_type }}</h5>
+                    <h5><b>Retirement:</b> {{ client.retirement }}</h5>
                 </div>
             </div>
         </div>
@@ -279,6 +295,7 @@
             <div style="margin-left: 50px; margin-bottom: 40px;">
                 <form action="" method="post" novalidate>
                     <p>Status: <select id="statusOptions">
+                                   <option value="None">None</option>
                                    <option value="Contract Sent">Contract Sent</option>
                                    <option value="Underwriting">Underwriting</option>
                                    <option value="Approved">Approved</option>
