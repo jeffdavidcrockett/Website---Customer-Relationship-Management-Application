@@ -4,7 +4,7 @@ import email
 
 class EmailParserTool:
     def __init__(self):
-        self.EMAIL_DOMAIN = "@gmail.com"
+        self.EMAIL_DOMAIN = ""
         self.EMAIL_USRNME = "" + self.EMAIL_DOMAIN
         self.EMAIL_PASSWD = ""
         self.MAIL_SERVER = 'smtp.gmail.com'
