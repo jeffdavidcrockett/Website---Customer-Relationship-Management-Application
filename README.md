@@ -1,5 +1,5 @@
 # Website---Customer-Interaction-Manager
-Website created with the Flask framework
+CRM website created with Python the Flask framework
 
 # About
 A business solution website designed to keep track of incoming clients, appointments, interactions, and the ability to send emails to the client.
