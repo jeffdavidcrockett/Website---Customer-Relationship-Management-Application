@@ -42,19 +42,63 @@ minutes = [('00', '00'), ('05', '05'), ('10', '10'), ('15', '15'),
 
 ampm = [('AM', 'AM'), ('PM', 'PM')]
 
+credit_menu = [('720+', '720+'), 
+			   ('680 - 719', '680 - 719'), 
+			   ('650 - 679', '650 - 679'), 
+			   ('600 - 649', '600 - 649'), 
+			   ('599 - less', '599 - less')]
+
+funding_menu = [('$0 - $50,000', '$0 - $50,000'), 
+				('$50,000 - $100,000', '$50,000 - $100,000'), 
+				('$100,000 - $200,000', '$100,000 - $200,000'),
+				('$200,000+', '$200,000+')]
+
+income_menu = [('$0 - $10,000', '$0 - $10,000'), 
+			   ('$10,000 - $25,000', '$10,000 - $25,000'), 
+			   ('$25,000 - $50,000', '$25,000 - $50,000'), 
+			   ('$50,000 - $200,000', '$50,000 - $200,000'), 
+			   ('$200,000 - $500,000', '$200,000 - $500,000'), 
+			   ('$500,000+', '$500,000+')]
+
+biz_menu = [('---', '---'), 
+			('Agriculture', 'Agriculture'), 
+			('Automotive: Dealer', 'Automotive: Dealer'), 
+			('Automotive: Repair', 'Automotive: Repair'), 
+			('Bar, Club or Restaurant', 'Bar, Club or Restaurant'),
+			('Business Services', 'Business Services'), 
+			('Convenience Store', 'Convenience Store'), 
+			('Gas Station', 'Gas Station'), 
+			('Construction', 'Construction'), 
+			('Education Services',  'Education Services'), 
+			('Finance', 'Finance'), 
+			('Insurance', 'Insurance'), 
+			('Forestry', 'Forestry'), 
+			('Fishing', 'Fishing'), 
+			('Mining', 'Mining'), 
+			('Healthcare', 'Healthcare'), 
+			('Medicine', 'Medicine'), 
+			('Law Firm', 'Law Firm'), 
+			('Legal Services', 'Legal Services'), 
+			('Lodging', 'Lodging'), 
+			('Manufacturing', 'Manufacturing'), 
+			('Non-Profit Organization', 'Non-Profit Organization'), 
+			('Real Estate', 'Real Estate'), 
+			('Religious Institution', 'Religious Institution'), 
+			('Retail Store', 'Retail Store'), 
+			('Transportation', 'Transportation'), 
+			('Trucking', 'Trucking'), 
+			('Wholesale', 'Wholesale'), 
+			('Other', 'Other')]
+
+lengthof_time = [('Not Yet Started', 'Not Yet Started'), 
+			     ('0 - 3 months', '0 - 3 months'), 
+			     ('3 months - 1 year', '3 months - 1 year'), 
+			     ('1 - 2 years', '1 - 2 years'), 
+			     ('2 - 5 years', '2 - 5 years'), 
+			     ('5+ years', '5+ years')]
+
 
 class ClientForm(FlaskForm):
-	credit_menu = [('720+', '720+'), 
-				   ('680 - 719', '680 - 719'), 
-				   ('650 - 679', '650 - 679'), 
-				   ('600 - 649', '600 - 649'), 
-				   ('599 - less', '599 - less')]
-
-	funding_menu = [('$10,000 - $24,999', '$10,000 - $24,999'), 
-					('$25,000 - $49,999', '$25,000 - $49,999'), 
-					('$50,000 - $99,999', '$50,000 - $99,999'),
-					('$100,000+', '$100,000+')]
-
 	first_name = StringField('First Name', validators=[DataRequired()])
 	last_name = StringField('Last Name', validators=[DataRequired()])
 	phone = StringField('Phone', validators=[DataRequired()])
@@ -183,3 +227,47 @@ class ClientStatusForm(FlaskForm):
 	status_menu = SelectField('Status', choices=choices, default='Contract Sent')
 	why = StringField('Why', validators=[DataRequired()])
 	submit = SubmitField('Submit Status Change')
+
+
+class ClientManualAdd(FlaskForm):
+	business_plan_menu = [('Yes', 'Yes'), 
+						  ('No', 'No')]
+	business_type_menu = [('Existing', 'Existing'), 
+						  ('Start or Buy a Business', 'Start or Buy a Business')]
+	company_type_menu = [('Limited Liability Corp', 'Limited Liability Corp'), 
+						 ('S Corporation', 'S Corporation'), 
+						 ('C Corporation', 'C Corporation'), 
+						 ('Limited Partnership', 'Limited Partnership'), 
+						 ('General Partnership', 'General Partnership'), 
+						 ('Unsure', 'Unsure'), 
+						 ('None', 'None')]
+	company_website_menu = [('Yes', 'Yes'), 
+							('No', 'No')]
+	loan_option_menu = [('Working Capital', 'Working Capital'), 
+						('Expand Your Business', 'Expand Your Business'), 
+						('Merchant Advance', 'Merchant Advance')]
+	location_menu = [('Yes', 'Yes'), 
+					 ('No', 'No')]
+	retirement_menu = [('More than $30,000', 'More than $30,000'), 
+					   ('Less than $30,000', 'Less than $30,000')]
+
+	first_name = StringField('First', validators=[DataRequired()])
+	last_name = StringField('Last', validators=[DataRequired()])
+	email = StringField('Email', validators=[DataRequired()])
+	credit_score = SelectField('Credit Score', choices=credit_menu, default=1)
+	avg_monthly_income = SelectField('Avg Monthly Income', choices=income_menu, default=1)
+	business_class = SelectField('Business Type', choices=biz_menu, default=1)
+	business_length = SelectField('Business Length', choices=lengthof_time, default=1)
+	business_name = StringField('Business Name', validators=[DataRequired()])
+	business_phone = StringField('Business Phone')
+	mobile_phone = StringField('Mobile Phone')
+	business_plan = SelectField('Business Plan?', choices=business_plan_menu, default=1)
+	business_type = SelectField('Business Type', choices=business_type_menu, default=1)
+	company_type = SelectField('Company Type', choices=company_type_menu, default=1)
+	company_website = SelectField('Company Website?', choices=company_website_menu, default=1)
+	loan_amount = SelectField('Loan Amount', choices=funding_menu, default=1)
+	loan_option = SelectField('Loan Purpose', choices=loan_option_menu, default=1)
+	physical_biz_location = SelectField('Physical Location?', choices=location_menu, default=1)
+	retirement_level = SelectField('Retirement Level', choices=retirement_menu, default=1)
+	zip_code = StringField('Zip Code')
+	submit = SubmitField('Submit Client')

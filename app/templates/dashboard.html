@@ -349,9 +349,11 @@
                 dataType: 'json', 
                 contentType: 'application/json', 
                 success: function(data) {
-                    alert(data);
-                    if (data == "Successfully Added Client") {
-                        location.reload(true);
+                    if (data != "Parse failure or No new clients") {
+                        alert(data);
+                        if (data == "Successfully Added Client") {
+                            location.reload(true);
+                        }
                     }
                 }, 
                 error: function() {

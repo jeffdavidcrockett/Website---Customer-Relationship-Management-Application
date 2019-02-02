@@ -9,6 +9,8 @@ class Marketer(UserMixin, db.Model):
 	username = db.Column(db.String(64), index=True, unique=True)
 	email = db.Column(db.String(120), index=True, unique=True)
 	password_hash = db.Column(db.String(128))
+	first_name = db.Column(db.String(60))
+	last_name = db.Column(db.String(60))
 	appointments = db.relationship('Appointment', backref='creator', lazy='dynamic')
 
 	def __repr__(self):

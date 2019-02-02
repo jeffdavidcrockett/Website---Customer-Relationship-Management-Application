@@ -1,7 +1,8 @@
 from flask import render_template, flash, redirect, url_for, request, jsonify, json
 from app import app, db, mail, csrf
 from app.forms import LoginForm, CreateAppointmentForm, SearchAppointmentForm, ClientForm, MessageInput, NoteInput, SearchClientForm, \
-MyAppointmentSearch, NewClientDisplayOptions, SendAgreementSearch, DataSelection, AddInteractionForm, ClientStatusForm
+MyAppointmentSearch, NewClientDisplayOptions, SendAgreementSearch, DataSelection, AddInteractionForm, ClientStatusForm, \
+ClientManualAdd
 from flask_login import current_user, login_user, login_required, logout_user
 from app.models import Marketer, Appointment, Memo, Note, Client, Interaction, ClientNote
 from werkzeug.urls import url_parse
@@ -123,10 +124,12 @@ def load_client_process():
 				load_client.connect()
 			except Exception as e:
 				return jsonify("Email connect failure")
+				
 			try:
 				email_ = load_client.find_clients()
 			except Exception as e:
 				return jsonify("Client find failure")
+
 			try:
 				client_data = load_client.parse_and_commit(email_)
 			except Exception as e:
@@ -390,6 +393,10 @@ def view_client():
 @app.route('/update_client_status', methods=['GET', 'POST'])
 @login_required
 def update_client_status():
+	"""
+	Route that updates the client status, as well as adding an interaction.
+	"""
+
 	if request.method == 'POST':
 		try:
 			data = request.get_json()
@@ -407,7 +414,8 @@ def update_client_status():
 			db.session.add(interaction)
 			db.session.commit()
 
-			return jsonify("Status successfully changed")
+			# return jsonify("Status successfully changed")
+			return redirect(url_for("view_client"))
 		except Exception as e:
 			return jsonify("Unsuccessful")
 
@@ -519,6 +527,42 @@ def delete_appt():
 			return jsonify("Appointment does not exist, or was not able to be deleted.")
 	except Exception as e:
 		return jsonify("Fail")
+
+@app.route('/manual-add', methods=['GET', 'POST'])
+@login_required
+def manual_add():
+	"""
+	Marketer can manually add client
+	"""
+
+	manual_form = ClientManualAdd()
+
+	if manual_form.validate_on_submit():
+		new_client = Client(first_name=manual_form.first_name.data, last_name=manual_form.last_name.data, 
+	                        email=manual_form.email.data, credit_score=manual_form.credit_score.data, 
+	                        signup_date=date_tool.get_current_date(), 
+	                        status='None', 
+	                        business_name=manual_form.business_name.data, 
+	                        business_class=manual_form.business_class.data, 
+	                        business_phone=manual_form.business_phone.data, 
+	                        mobile_phone=manual_form.mobile_phone.data, 
+	                        zip_code=manual_form.zip_code.data, 
+	                        business_type=manual_form.business_type.data, 
+	                        loan_option=manual_form.loan_option.data, 
+	                        loan_amount=manual_form.loan_amount.data, 
+	                        avg_monthly_income=manual_form.avg_monthly_income.data, 
+	                        retirement=manual_form.retirement_level.data, 
+	                        company_type=manual_form.company_type.data, 
+	                        business_length=manual_form.business_length.data, 
+	                        company_website=manual_form.company_website.data, 
+	                        physical_biz_location=manual_form.physical_biz_location.data, 
+	                        business_plan=manual_form.business_plan.data)
+		
+		db.session.add(new_client)
+		db.session.commit()
+		return redirect(url_for('search_clients'))
+
+	return render_template('manual-add-client.html', manual_form=manual_form, pretty_date=pretty_date)
 	
 @app.route('/data', methods=['GET', 'POST'])
 @login_required
@@ -565,5 +609,3 @@ def our_data():
 	
 	return render_template('data.html', marketers=marketers, data_form=data_form, 
 						   num_of_clients=num_of_clients, pretty_date=pretty_date)
-
-

@@ -27,35 +27,49 @@
             var clientId = '{{ client.id }}';
             var statusOptionsElem = document.getElementById("statusOptions");
             var statusTo = statusOptionsElem.options[statusOptionsElem.selectedIndex].value;
-            
-            $.ajax({
-                type: 'POST',
-                url: '{{ url_for("update_client_status") }}',
-                data: JSON.stringify({ 
-                    'statusTo': statusTo, 
-                    'clientId': clientId
-                }),
-                dataType: "json",
-                contentType: 'application/json',
-                success: function(data) {
-                    alert(data);
-                    // window.location.href = window.location.href;
 
-                }, 
-                error: function() {
-                    alert("Fail");
-                }
-            });
             $.ajax({
-                url: window.location.href,
-                headers: {
-                    "Pragma": "no-cache",
-                    "Expires": -1,
-                    "Cache-Control": "no-cache"
-                    }
-                }).done(function () {
-                window.location.reload(true);
+                type:'POST', 
+                url: '{{ url_for("update_client_status") }}', 
+                data: JSON.stringify({
+                    'statusTo': statusTo,
+                    'clientId': clientId
+                }), 
+                dataType: "json", 
+                contentType: 'application/json', 
             });
+
+            // $.ajax({
+            //     type: 'POST',
+            //     url: '{{ url_for("update_client_status") }}',
+            //     data: JSON.stringify({ 
+            //         'statusTo': statusTo, 
+            //         'clientId': clientId
+            //     }),
+            //     dataType: "json",
+            //     contentType: 'application/json',
+            //     success: function(data) {
+            //         // alert(data);
+
+            //         $.ajax({
+            //             url: window.location.href,
+            //             headers: {
+            //                 "Pragma": "no-cache",
+            //                 "Expires": -1,
+            //                 "Cache-Control": "no-cache"
+            //                 }, 
+            //             success: function() {
+            //                 window.location.reload(true);
+            //             }, 
+            //             error: function() {
+            //                 alert('internal ajax failed');
+            //             }
+            //             });
+            //     }, 
+            //     error: function() {
+            //         // alert("Fail");
+            //     }
+            //     });
         }
     </script>
     <script type="text/javascript">
@@ -77,7 +91,7 @@
             var apptDate = year + '-' + month + '-' + day;
             var apptTime = hour + ':' + minute + ' ' + ampm;
 
-            if (confirm('Are you sure you want to set an appointment for ' + apptDate + ' at ' + apptTime + '?') == true) {
+            // if (confirm('Are you sure you want to set an appointment for ' + apptDate + ' at ' + apptTime + '?') == true) {
                 $.ajax({
                     type: 'POST',
                     url: '{{ url_for("create_appt_process") }}',
@@ -90,25 +104,26 @@
                     dataType: 'json', 
                     contentType: 'application/json', 
                     success: function(data) {
-                        alert(data);
-                        // window.location.href = window.location.href;
-                        // window.location.reload(true);
-                    }, 
-                    error: function() {
-                        alert("AJAX Fail");
-                    }
-                });
-                $.ajax({
+                        // alert(data);
+
+                        $.ajax({
                     url: window.location.href,
                     headers: {
                         "Pragma": "no-cache",
                         "Expires": -1,
                         "Cache-Control": "no-cache"
-                        }
-                    }).done(function () {
+                        }, 
+                    success: function() {
                         window.location.reload(true);
+                    }
+                    });
+                    }, 
+                    error: function() {
+                        // alert("AJAX Fail");
+                    }
                 });
-            }
+                
+            // }
         }
     </script>
     <script type="text/javascript">
@@ -116,7 +131,7 @@
             var clientId = '{{ client.id }}';
             var noteContents = document.getElementById("clientNoteInput").value;
 
-            if (confirm("Are you sure you want to create a new note for this client?") == true) {
+            // if (confirm("Are you sure you want to create a new note for this client?") == true) {
                 $.ajax({
                     type: 'POST', 
                     url: '{{ url_for("create_client_note") }}',
@@ -127,25 +142,26 @@
                     dataType: 'json', 
                     contentType: 'application/json', 
                     success: function(data) {
-                        alert(data);
-                        // window.location.href = window.location.href;
-                        // window.location.reload(true);
-                    }, 
-                    error: function() {
-                        alert("AJAX Fail");
-                    }
-                });
-                $.ajax({
+                        // alert(data);
+
+                        $.ajax({
                     url: window.location.href,
                     headers: {
                         "Pragma": "no-cache",
                         "Expires": -1,
                         "Cache-Control": "no-cache"
-                        }
-                    }).done(function () {
+                        }, 
+                    success: function() {
                         window.location.reload(true);
+                        }
+                    });
+                    }, 
+                    error: function() {
+                        // alert("AJAX Fail");
+                    }
                 });
-            }
+                
+            // }
         }
     </script>
 
@@ -248,7 +264,7 @@
 
                     <ul class="nav navbar-nav navbar-right">
                         
-                        <!-- <li class="dropdown">
+                        <li class="dropdown">
                               <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                                     <p>
 										CLIENT OPTIONS
@@ -257,15 +273,15 @@
 
                               </a>
                               <ul class="dropdown-menu">
-                                <li><a href="{{ url_for('search_clients') }}">Search Clients</a></li>
-                                <li><a href="#">Edit Specific Client</a></li>
-                                <li><a href="#">ReservedForFutureUse</a></li>
+                                <!-- <li><a href="#">Search Clients</a></li> -->
+                                <li><a href="#">Manually Add Client</a></li>
+                                <!-- <li><a href="#">ReservedForFutureUse</a></li>
                                 <li><a href="#">ReservedForFutureUse</a></li>
                                 <li><a href="#">ReservedForFutureUse</a></li>
                                 <li class="divider"></li>
-                                <li><a href="#">ReservedForFutureUse</a></li>
+                                <li><a href="#">ReservedForFutureUse</a></li> -->
                               </ul>
-                        </li> -->
+                        </li>
                         <a class="navbar-brand" style="font-size: 15px; margin-left: 30px;" href="#">{{ pretty_date }}</a>
                         <li>
                             <a href="{{ url_for('logout') }}">
@@ -329,7 +345,7 @@
                 <h2>Change Status</h2>
             </div>
             <div style="margin-left: 50px; margin-bottom: 40px;">
-                <form action="" method="post" novalidate>
+                <form action="" method="post">
                     <p>Status: <select id="statusOptions">
                                    <option value="None">None</option>
                                    <option value="Contract Sent">Contract Sent</option>
