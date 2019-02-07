@@ -24,52 +24,29 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script type="text/javascript">
         function updateClientStatus() {
-            var clientId = '{{ client.id }}';
             var statusOptionsElem = document.getElementById("statusOptions");
             var statusTo = statusOptionsElem.options[statusOptionsElem.selectedIndex].value;
+            var clientId = '{{ client.id }}';
+            var url = '/jmrfunding/api/clients/' + clientId;
 
             $.ajax({
-                type:'POST', 
-                url: '{{ url_for("update_client_status") }}', 
+                type:'PUT', 
+                url: url, 
                 data: JSON.stringify({
                     'statusTo': statusTo,
-                    'clientId': clientId
                 }), 
                 dataType: "json", 
                 contentType: 'application/json', 
+                success: function(data) {
+                    var newStatus = data['clientStatus'];
+
+                    document.getElementById("hStatus").innerHTML = "Current Status: " + newStatus;
+                    document.getElementById("hStatus").style.fontWeight = "bold";
+                }, 
+                error: function() {
+                    console.log("errorssss");
+                }
             });
-
-            // $.ajax({
-            //     type: 'POST',
-            //     url: '{{ url_for("update_client_status") }}',
-            //     data: JSON.stringify({ 
-            //         'statusTo': statusTo, 
-            //         'clientId': clientId
-            //     }),
-            //     dataType: "json",
-            //     contentType: 'application/json',
-            //     success: function(data) {
-            //         // alert(data);
-
-            //         $.ajax({
-            //             url: window.location.href,
-            //             headers: {
-            //                 "Pragma": "no-cache",
-            //                 "Expires": -1,
-            //                 "Cache-Control": "no-cache"
-            //                 }, 
-            //             success: function() {
-            //                 window.location.reload(true);
-            //             }, 
-            //             error: function() {
-            //                 alert('internal ajax failed');
-            //             }
-            //             });
-            //     }, 
-            //     error: function() {
-            //         // alert("Fail");
-            //     }
-            //     });
         }
     </script>
     <script type="text/javascript">
@@ -128,40 +105,32 @@
     </script>
     <script type="text/javascript">
         function createClientNote() {
-            var clientId = '{{ client.id }}';
             var noteContents = document.getElementById("clientNoteInput").value;
+            var clientId = '{{ client.id }}';
+            var url = '/jmrfunding/api/notes/' + clientId;
 
-            // if (confirm("Are you sure you want to create a new note for this client?") == true) {
-                $.ajax({
-                    type: 'POST', 
-                    url: '{{ url_for("create_client_note") }}',
-                    data: JSON.stringify({
-                        'clientId': clientId, 
-                        'noteContents': noteContents
-                    }), 
-                    dataType: 'json', 
-                    contentType: 'application/json', 
-                    success: function(data) {
-                        // alert(data);
-
-                        $.ajax({
-                    url: window.location.href,
-                    headers: {
-                        "Pragma": "no-cache",
-                        "Expires": -1,
-                        "Cache-Control": "no-cache"
-                        }, 
-                    success: function() {
-                        window.location.reload(true);
-                        }
-                    });
-                    }, 
-                    error: function() {
-                        // alert("AJAX Fail");
-                    }
-                });
-                
-            // }
+            $.ajax({
+                type: 'POST', 
+                url: url,
+                data: JSON.stringify({
+                    'noteContents': noteContents
+                }), 
+                dataType: 'json', 
+                contentType: 'application/json', 
+                success: function(data) {
+                //     var noteTbody = document.getElementById("noteTbody");
+                //     var marketersArray = data['marketers'];
+                //     var bodiesArray = data['bodies']
+                //     var row = generateRow(bodiesArray.length);
+                //     for(var i = 0; i < bodiesArray.length; i++) {
+                //         noteTbody.appendChild(row.cloneNode(true));
+                //     }
+                    window.location.reload(true);
+                }, 
+                error: function() {
+                    console.log("Error")
+                }
+            });
         }
     </script>
 
@@ -306,7 +275,7 @@
 
         <div style="margin-left: 40px;">
             <h1>{{ client.first_name }} {{ client.last_name }}</h1>
-            <h3 style="color: #16a6bc;"><b>Current Status: {{ client.status }}</b></h3>
+            <h3 id="hStatus" style="color: #16a6bc;"><b>Current Status: {{ client.status }}</b></h3>
             <div>
                 <div style="float: left; margin-right: 100px;">
                     <h5><b>ID:</b> {{ client.id }}</h5>
@@ -358,7 +327,7 @@
                                    <option value="Complete">Complete</option>
                                    <option value="Declined">Declined</option>
                                </select>
-                    <button onclick="updateClientStatus()">Submit Status Change</button></p>
+                    <button type="button" onclick="updateClientStatus()">Submit Status Change</button></p>
                 </form>
             </div>
         </div>
@@ -473,7 +442,7 @@
             <div style="margin-left: 50px; margin-bottom: 40px;">
                 <form action="" method="post" novalidate>
                     <p><input id="clientNoteInput" type="text" name="addNote" size="50">
-                    <button onclick="createClientNote()">Add Note</button></p>
+                    <button type="button" onclick="createClientNote()">Add Note</button></p>
                 </form>
             </div>
         </div>
@@ -536,7 +505,7 @@
                                         <th>Marketer</th>
                                         <th>Note Body</th>
                                     </thead>
-                                    <tbody>
+                                    <tbody id="noteTbody">
                                         {% for note in notes %}
                                         <tr>
                                             <td>{{ note.marketer }}</td>

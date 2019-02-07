@@ -22,7 +22,76 @@
     <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
     <link href='http://fonts.googleapis.com/css?family=Roboto:400,700,300' rel='stylesheet' type='text/css'>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript">
+        function createClient() {
+            var firstName = document.getElementById("firstName").value;
+            var lastName = document.getElementById("lastName").value;
+            var email = document.getElementById("email").value;
+            var creditScoreElem = document.getElementById("creditScore");
+            var creditScore = creditScoreElem.options[creditScoreElem.selectedIndex].value;
+            var avgMonthlyIncElem = document.getElementById("avgMonthly$");
+            var avgMonthlyInc = avgMonthlyIncElem.options[avgMonthlyIncElem.selectedIndex].value;
+            var bizClassElem = document.getElementById("bizClass");
+            var bizClass = bizClassElem.options[bizClassElem.selectedIndex].value;
+            var bizLengthElem = document.getElementById("bizLength");
+            var bizLength = bizLengthElem.options[bizLengthElem.selectedIndex].value;
+            var bizLengthElem = document.getElementById("bizLength");
+            var bizName = document.getElementById("bizName").value;
+            var bizPhone = document.getElementById("bizPhone").value;
+            var mobilePhone = document.getElementById("mobilePhone").value;
+            var bizPlanElem = document.getElementById("bizPlan");
+            var bizPlan = bizPlanElem.options[bizPlanElem.selectedIndex].value;
+            var bizTypeElem = document.getElementById("bizType");
+            var bizType = bizTypeElem.options[bizTypeElem.selectedIndex].value;
+            var companyTypeElem = document.getElementById("companyType");
+            var companyType = companyTypeElem.options[companyTypeElem.selectedIndex].value;
+            var websiteElem = document.getElementById("website");
+            var website = websiteElem.options[websiteElem.selectedIndex].value;
+            var loanAmountElem = document.getElementById("loanAmount");
+            var loanAmount = loanAmountElem.options[loanAmountElem.selectedIndex].value;
+            var loanPurposeElem = document.getElementById("loanPurpose");
+            var loanPurpose = loanPurposeElem.options[loanPurposeElem.selectedIndex].value;
+            var physicalLocationElem = document.getElementById("physicalLocation");
+            var physicalLocation = physicalLocationElem.options[physicalLocationElem.selectedIndex].value;
+            var retirementLevelElem = document.getElementById("retirementLevel");
+            var retirementLevel = retirementLevelElem.options[retirementLevelElem.selectedIndex].value;
+            var zipCode = document.getElementById("zipCode").value;
 
+            $.ajax({
+                type: 'POST', 
+                url: '/jmrfunding/api/clients', 
+                data: JSON.stringify({
+                    'firstName': firstName,
+                    'lastName': lastName,
+                    'email': email,
+                    'creditScore': creditScore,
+                    'avgMonthlyInc': avgMonthlyInc,
+                    'bizClass': bizClass,
+                    'bizLength': bizLength,
+                    'bizName': bizName,
+                    'bizPhone': bizPhone,
+                    'mobilePhone': mobilePhone,
+                    'bizPlan': bizPlan,
+                    'bizType': bizType,
+                    'companyType': companyType,
+                    'website': website,
+                    'loanAmount': loanAmount,
+                    'loanPurpose': loanPurpose,
+                    'physicalLocation': physicalLocation,
+                    'retirement': retirementLevel,
+                    'zipCode': zipCode
+                }),
+                dataType: 'json',
+                contentType: 'application/json',
+                success: function(data) {
+                    alert(data);
+                },
+                error: function() {
+                    console.log("Fail");
+                }
+            });
+        }
+    </script>
     
 
 </head>
@@ -170,30 +239,124 @@
                 <form action="" method="post">
                     {{ manual_form.hidden_tag() }}
                     <div style="float: left; margin-right: 100px;">
-                        <h5>{{ manual_form.first_name.label }} {{ manual_form.first_name }}</h5>
-                        <h5>{{ manual_form.last_name.label }} {{ manual_form.last_name }}</h5>
-                        <h5>{{ manual_form.email.label }} {{ manual_form.email }}</h5>
-                        <h5>{{ manual_form.credit_score.label }} {{ manual_form.credit_score }}</h5>
-                        <h5>{{ manual_form.avg_monthly_income.label }} {{ manual_form.avg_monthly_income }}</h5>
-                        <h5>{{ manual_form.business_class.label }} {{ manual_form.business_class }}</h5>
-                        <h5>{{ manual_form.business_length.label }} {{ manual_form.business_length }}</h5>
-                        {{ manual_form.submit() }}
+                        <input style="margin: 10px;" id="firstName" type="text" placeholder="First Name" name="addFirst" size="30"><br>
+                        <input style="margin: 10px;" id="lastName" type="text" placeholder="Last Name" name="addLast" size="30"><br>
+                        <input style="margin: 10px;" id="email" type="text" placeholder="Email" name="addEmail" size="30"><br>
+                        <select id="creditScore" style="margin: 10px;">
+                            <option value="" disabled selected>Credit Score</option>
+                            <option value="720+">720+</option>
+                            <option value="680 - 719">680 - 719</option>
+                            <option value="650 - 679">650 - 679</option>
+                            <option value="600 - 649">600 - 649</option>
+                            <option value="599 - less">599 - less</option>
+                        </select><br>
+                        <select id="avgMonthly$" style="margin: 10px;">
+                            <option value="" disabled selected>Avg Monthly Income</option>
+                            <option value="$0 - $10,000">$0 - $10,000</option>
+                            <option value="$10,000 - $25,000">$10,000 - $25,000</option>
+                            <option value="$25,000 - $50,000">$25,000 - $50,000</option>
+                            <option value="$50,000 - $200,000">$50,000 - $200,000</option>
+                            <option value="$200,000 - $500,000">$200,000 - $500,000</option>
+                            <option value="$500,000+">$500,000+</option>
+                        </select><br>
+                        <select id="bizClass" style="margin: 10px;">
+                            <option value="" disabled selected>Business Class</option>
+                            <option value="Agriculture">Agriculture</option>
+                            <option value="Automotive: Dealer">Automotive: Dealer</option>
+                            <option value="Automotive: Repair">Automotive: Repair</option>
+                            <option value="Bar, Club or Restaurant">Bar, Club or Restaurant</option>
+                            <option value="Business Services">Business Services</option>
+                            <option value="Convenience Store">Convenience Store</option>
+                            <option value="Gas Station">Gas Station</option>
+                            <option value="Construction">Construction</option>
+                            <option value="Education Services">Education Services</option>
+                            <option value="Finance">Finance</option>
+                            <option value="Insurance">Insurance</option>
+                            <option value="Forestry">Forestry</option>
+                            <option value="Fishing">Fishing</option>
+                            <option value="Mining">Mining</option>
+                            <option value="Healthcare">Healthcare</option>
+                            <option value="Medicine">Medicine</option>
+                            <option value="Law Firm">Law Firm</option>
+                            <option value="Legal Services">Legal Services</option>
+                            <option value="Lodging">Lodging</option>
+                            <option value="Manufacturing">Manufacturing</option>
+                            <option value="Non-Profit Organization">Non-Profit Organization</option>
+                            <option value="Real Estate">Real Estate</option>
+                            <option value="Religious Institution">Religious Institution</option>
+                            <option value="Retail Store">Retail Store</option>
+                            <option value="Transportation">Transportation</option>
+                            <option value="Trucking">Trucking</option>
+                            <option value="Wholesale">Wholesale</option>
+                            <option value="Other">Other</option>
+                        </select><br>
+                        <select id="bizLength" style="margin: 10px;">
+                            <option value="" disabled selected>Business Length</option>
+                            <option value="Not Yet Started">Not Yet Started</option>
+                            <option value="0 - 3 months">0 - 3 months</option>
+                            <option value="3 months - 1 year">3 months - 1 year</option>
+                            <option value="1 - 2 years">1 - 2 years</option>
+                            <option value="2 - 5 years">2 - 5 years</option>
+                            <option value="5+ years">5+ years</option>
+                        </select><br>
+                        <button style="margin: 10px;" type="button" onclick="createClient()">Create Client</button>
                     </div>
                     <div style="float: left; margin-bottom: 20px; margin-right: 100px;">
-                        <h5>{{ manual_form.business_name.label }} {{ manual_form.business_name }}</h5>
-                        <h5>{{ manual_form.business_phone.label }} {{ manual_form.business_phone }}</h5>
-                        <h5>{{ manual_form.mobile_phone.label }} {{ manual_form.mobile_phone }}</h5>
-                        <h5>{{ manual_form.business_plan.label }} {{ manual_form.business_plan }}</h5>
-                        <h5>{{ manual_form.business_type.label }} {{ manual_form.business_type }}</h5>
-                        <h5>{{ manual_form.company_type.label }} {{ manual_form.company_type }}</h5>
-                        <h5>{{ manual_form.company_website.label }} {{ manual_form.company_website }}</h5>
+                        <input style="margin: 10px;" id="bizName" type="text" placeholder="Business Name" name="addBizName" size="30"><br>
+                        <input style="margin: 10px;" id="bizPhone" type="text" placeholder="Business Phone" name="addBizPhone" size="30"><br>
+                        <input style="margin: 10px;" id="mobilePhone" type="text" placeholder="Mobile Phone" name="addMobilePhone" size="30"><br>
+                        <select id="bizPlan" style="margin: 10px;">
+                            <option value="" disabled selected>Business Plan?</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select><br>
+                        <select id="bizType" style="margin: 10px;">
+                            <option value="" disabled selected>Business Type</option>
+                            <option value="Existing">Existing</option>
+                            <option value="Start or Buy a Business">Start or Buy a Business</option>
+                        </select><br>
+                        <select id="companyType" style="margin: 10px;">
+                            <option value="" disabled selected>Company Type</option>
+                            <option value="Limited Liability Corp">Limited Liability Corp</option>
+                            <option value="S Corporation">S Corporation</option>
+                            <option value="C Corporation">C Corporation</option>
+                            <option value="Limited Partnership">Limited Partnership</option>
+                            <option value="General Partnership">General Partnership</option>
+                            <option value="Unsure">Unsure</option>
+                            <option value="None">None</option>
+                        </select><br>
+                        <select id="website" style="margin: 10px;">
+                            <option value="" disabled selected>Company Website?</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
                     </div>
                     <div style="float: left; margin-bottom: 20px;">
-                        <h5>{{ manual_form.loan_amount.label }} {{ manual_form.loan_amount }}</h5>
-                        <h5>{{ manual_form.loan_option.label }} {{ manual_form.loan_option }}</h5>
-                        <h5>{{ manual_form.physical_biz_location.label }} {{ manual_form.physical_biz_location }}</h5>
-                        <h5>{{ manual_form.retirement_level.label }} {{ manual_form.retirement_level }}</h5>
-                        <h5>{{ manual_form.zip_code.label }} {{ manual_form.zip_code }}</h5>
+                        <select id="loanAmount" style="margin: 10px;">
+                            <option value="" disabled selected>Loan Amount</option>
+                            <option value="$0 - $50,000">$0 - $50,000</option>
+                            <option value="$50,000 - $100,000">$50,000 - $100,000</option>
+                            <option value="$100,000 - $200,000">$100,000 - $200,000</option>
+                            <option value="$50,000 - $100,000">$50,000 - $100,000</option>
+                            <option value="$200,000+">$200,000+</option>
+                        </select><br>
+                        <select id="loanPurpose" style="margin: 10px;">
+                            <option value="" disabled selected>Loan Purpose</option>
+                            <option value="Working Capital">Working Capital</option>
+                            <option value="Expand Your Business">Expand Your Business</option>
+                            <option value="Merchange Advance">Merchant Advance</option>
+                        </select><br>
+                        <select id="physicalLocation" style="margin: 10px;">
+                            <option value="" disabled selected>Physical Location?</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select><br>
+                        <select id="retirementLevel" style="margin: 10px;">
+                            <option value="" disabled selected>Retirement Level</option>
+                            <option value="More than $30,000">More than $30,000</option>
+                            <option value="Less than $30,000">Less than $30,000</option>
+                        </select><br>
+                        <input style="margin: 10px;" id="zipCode" type="text" placeholder="Zip Code" name="addZipCode" size="30">
                     </div>
                 </form>
             </div>

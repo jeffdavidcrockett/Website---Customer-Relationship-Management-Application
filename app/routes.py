@@ -390,34 +390,78 @@ def view_client():
 						   notes=note_results, pretty_date=pretty_date)
 
 @csrf.exempt
-@app.route('/update_client_status', methods=['GET', 'POST'])
+@app.route('/jmrfunding/api/clients/<int:client_id>', methods=['PUT'])
 @login_required
-def update_client_status():
+def update_client_status(client_id):
 	"""
 	Route that updates the client status, as well as adding an interaction.
 	"""
 
-	if request.method == 'POST':
-		try:
-			data = request.get_json()
-			status_to = data['statusTo']
-			client_id = data['clientId']
+	try:
+		data = request.get_json()
+		status_to = data['statusTo']
 
-			client = Client.query.filter_by(id=client_id).first()
-			client.status = status_to
-			interaction = Interaction(client_id=client_id,
-		 							  marketer=str(current_user),
-		 							  date=date_tool.get_current_date(),
-		 							  time=date_tool.get_current_time(),
-								      type_of='Status Change',
-									  about='Changed status to ' + status_to)
-			db.session.add(interaction)
-			db.session.commit()
+		client = Client.query.filter_by(id=client_id).first()
+		client.status = status_to
+		interaction = Interaction(client_id=client_id,
+		 						  marketer=str(current_user),
+		 						  date=date_tool.get_current_date(),
+		 						  time=date_tool.get_current_time(),
+								  type_of='Status Change',
+								  about='Changed status to ' + status_to)
+		db.session.add(interaction)
+		db.session.commit()
+		client_updated = Client.query.filter_by(id=client_id).first()
+		
+		return jsonify({'clientStatus': client_updated.status})
+	except Exception as e:
+		return jsonify("Unsuccessful")
 
-			# return jsonify("Status successfully changed")
-			return redirect(url_for("view_client"))
-		except Exception as e:
-			return jsonify("Unsuccessful")
+@csrf.exempt
+@app.route('/jmrfunding/api/clients', methods=['POST'])
+@login_required
+def create_client():
+	"""
+	API access for creating new clients manually
+	"""
+
+	try:
+		data = request.get_json()
+		new_client = Client(first_name=data['firstName'], last_name=data['lastName'], 
+		                    email=data['email'], credit_score=data['creditScore'], 
+		                    signup_date=date_tool.get_current_date(), 
+		                    status='None', 
+		                    business_name=data['bizName'], 
+		                    business_class=data['bizClass'], 
+		                    business_phone=data['bizPhone'], 
+		                    mobile_phone=data['mobilePhone'], 
+		                    zip_code=data['zipCode'], 
+		                    business_type=data['bizType'], 
+		                    loan_option=data['loanPurpose'], 
+		                    loan_amount=data['loanAmount'], 
+		                    avg_monthly_income=data['avgMonthlyInc'], 
+		                    retirement=data['retirement'], 
+		                    company_type=data['companyType'], 
+		                    business_length=data['bizLength'], 
+		                    company_website=data['website'], 
+		                    physical_biz_location=data['physicalLocation'], 
+		                    business_plan=data['bizPlan'])
+		db.session.add(new_client)
+		db.session.commit()
+		return jsonify("Successfully added Client")
+	except Exception as e:
+		return jsonify("Unsuccessful")
+
+@app.route('/manual-add', methods=['GET', 'POST'])
+@login_required
+def manual_add():
+	"""
+	Marketer can manually add client
+	"""
+
+	manual_form = ClientManualAdd()
+
+	return render_template('manual-add-client.html', manual_form=manual_form, pretty_date=pretty_date)
 
 @csrf.exempt
 @app.route('/create_appt_process', methods=['GET', 'POST'])
@@ -455,24 +499,28 @@ def create_appt_process():
 			return jsonify("Unsuccessful")
 
 @csrf.exempt
-@app.route('/create_client_note', methods=['GET', 'POST'])
+@app.route('/jmrfunding/api/notes/<int:client_id>', methods=['POST'])
 @login_required
-def create_client_note():
-	if request.method == 'POST':
-		try:
-			data = request.get_json()
-			client_id = data['clientId']
-			note_contents = data['noteContents']
+def create_client_note(client_id):
+	try:
+		data = request.get_json()
+		note_contents = data['noteContents']
+		note = ClientNote(client_id=client_id, 
+						  marketer=str(current_user), 
+						  body=note_contents)
+		db.session.add(note)
+		db.session.commit()
+		updated_notes = db.session.query(ClientNote).filter_by(client_id=client_id)[:-30:-1]
+		marketer_list = []
+		body_list = []
 
-			note = ClientNote(client_id=client_id, 
-						      marketer=str(current_user), 
-						      body=note_contents)
-			db.session.add(note)
-			db.session.commit()
+		for i in range(len(updated_notes)):
+			marketer_list.append(updated_notes[i].marketer)
+			body_list.append(updated_notes[i].body)
 
-			return jsonify("Successfully added note to client")
-		except Exception as e:
-			return jsonify("Unsuccessful")
+		return jsonify({"marketers": marketer_list, "bodies": body_list})
+	except Exception as e:
+		return jsonify("Unsuccessful")
 
 @app.route('/add_interact', methods=['GET', 'POST'])
 @login_required
@@ -527,42 +575,6 @@ def delete_appt():
 			return jsonify("Appointment does not exist, or was not able to be deleted.")
 	except Exception as e:
 		return jsonify("Fail")
-
-@app.route('/manual-add', methods=['GET', 'POST'])
-@login_required
-def manual_add():
-	"""
-	Marketer can manually add client
-	"""
-
-	manual_form = ClientManualAdd()
-
-	if manual_form.validate_on_submit():
-		new_client = Client(first_name=manual_form.first_name.data, last_name=manual_form.last_name.data, 
-	                        email=manual_form.email.data, credit_score=manual_form.credit_score.data, 
-	                        signup_date=date_tool.get_current_date(), 
-	                        status='None', 
-	                        business_name=manual_form.business_name.data, 
-	                        business_class=manual_form.business_class.data, 
-	                        business_phone=manual_form.business_phone.data, 
-	                        mobile_phone=manual_form.mobile_phone.data, 
-	                        zip_code=manual_form.zip_code.data, 
-	                        business_type=manual_form.business_type.data, 
-	                        loan_option=manual_form.loan_option.data, 
-	                        loan_amount=manual_form.loan_amount.data, 
-	                        avg_monthly_income=manual_form.avg_monthly_income.data, 
-	                        retirement=manual_form.retirement_level.data, 
-	                        company_type=manual_form.company_type.data, 
-	                        business_length=manual_form.business_length.data, 
-	                        company_website=manual_form.company_website.data, 
-	                        physical_biz_location=manual_form.physical_biz_location.data, 
-	                        business_plan=manual_form.business_plan.data)
-		
-		db.session.add(new_client)
-		db.session.commit()
-		return redirect(url_for('search_clients'))
-
-	return render_template('manual-add-client.html', manual_form=manual_form, pretty_date=pretty_date)
 	
 @app.route('/data', methods=['GET', 'POST'])
 @login_required
