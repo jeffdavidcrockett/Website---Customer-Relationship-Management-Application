@@ -4,7 +4,7 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 class Config:
 	DEBUG = True
-	SECRET_KEY = '***'
+	SECRET_KEY = os.environ.get('SECRET_KEY') or '***'
 	SQLALCHEMY_DATABASE_URI = '***'
 	SQLALCHEMY_TRACK_MODIFICATIONS = False
 	WTF_CSRF_ENABLED = True

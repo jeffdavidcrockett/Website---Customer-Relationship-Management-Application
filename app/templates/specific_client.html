@@ -42,6 +42,7 @@
 
                     document.getElementById("hStatus").innerHTML = "Current Status: " + newStatus;
                     document.getElementById("hStatus").style.fontWeight = "bold";
+                    window.location.reload(true);
                 }, 
                 error: function() {
                     console.log("errorssss");
@@ -68,10 +69,10 @@
             var apptDate = year + '-' + month + '-' + day;
             var apptTime = hour + ':' + minute + ' ' + ampm;
 
-            // if (confirm('Are you sure you want to set an appointment for ' + apptDate + ' at ' + apptTime + '?') == true) {
+            if (confirm('Are you sure you want to set an appointment for ' + apptDate + ' at ' + apptTime + '?') == true) {
                 $.ajax({
                     type: 'POST',
-                    url: '{{ url_for("create_appt_process") }}',
+                    url: '/jmrfunding/api/appointments',
                     data: JSON.stringify({
                         'clientId': clientId,
                         'apptDate': apptDate,
@@ -81,26 +82,14 @@
                     dataType: 'json', 
                     contentType: 'application/json', 
                     success: function(data) {
-                        // alert(data);
-
-                        $.ajax({
-                    url: window.location.href,
-                    headers: {
-                        "Pragma": "no-cache",
-                        "Expires": -1,
-                        "Cache-Control": "no-cache"
-                        }, 
-                    success: function() {
+                        alert(data);
                         window.location.reload(true);
-                    }
-                    });
                     }, 
                     error: function() {
-                        // alert("AJAX Fail");
+                        alert("AJAX Fail");
                     }
                 });
-                
-            // }
+            }
         }
     </script>
     <script type="text/javascript">
@@ -118,13 +107,6 @@
                 dataType: 'json', 
                 contentType: 'application/json', 
                 success: function(data) {
-                //     var noteTbody = document.getElementById("noteTbody");
-                //     var marketersArray = data['marketers'];
-                //     var bodiesArray = data['bodies']
-                //     var row = generateRow(bodiesArray.length);
-                //     for(var i = 0; i < bodiesArray.length; i++) {
-                //         noteTbody.appendChild(row.cloneNode(true));
-                //     }
                     window.location.reload(true);
                 }, 
                 error: function() {
@@ -428,7 +410,7 @@
                                 <option value="AM">AM</option>
                                 <option value="PM">PM</option>
                             </select></p>
-                    <p><input id="apptNotes" type="text" name="notes" size="35" placeholder="Appointment Notes"> <button onclick="createAppointment()">Create Appointment</button></p>
+                    <p><input id="apptNotes" type="text" name="notes" size="35" placeholder="Appointment Notes"> <button type="button" onclick="createAppointment()">Create Appointment</button></p>
                 </form>
             </div>
         </div>

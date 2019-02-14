@@ -28,6 +28,7 @@ class MyDateTools:
         """
         Returns the current date formatted as year-month-day.
         """
+        
         return datetime.datetime.today().strftime('%Y-%m-%d')
 
     def get_currentpretty_date(self):
@@ -42,6 +43,7 @@ class MyDateTools:
         """
         Returns the full date of the last day of the current week
         """
+
         current_date = datetime.date.today()
         current_day = current_date.day
         day_val = current_date.weekday()
@@ -65,6 +67,7 @@ class MyDateTools:
         """
         Returns the beginning and end dates of the current month
         """
+
         year = self.get_current_year()
         month = self.get_current_month()
         num_of_days = calendar.monthrange(year, month)[1]
@@ -73,10 +76,24 @@ class MyDateTools:
 
         return start_date, end_date
 
+    def get_begin_endof_month(self, month, year):
+        """
+        Return the beginning and end dates of desired month and year
+        :param month: The desired month
+        :param year: The desired year
+        """
+
+        num_of_days = calendar.monthrange(year, month)[1]
+        start_date = datetime.date(year, month, 1)
+        end_date = datetime.date(year, month, num_of_days)
+        
+        return str(start_date), str(end_date)
+
     def get_posyears_set(self):
         """
         Returns a list of future years, starting with the current year.
         """
+
         current_year = self.get_current_year()
         year_list = []
         year = 0
@@ -91,6 +108,7 @@ class MyDateTools:
         """
         Returns the current Utah time in 12hr format.
         """
+
         our_zone = pytz.timezone('US/Arizona')
         current_time = datetime.datetime.now(our_zone)
 

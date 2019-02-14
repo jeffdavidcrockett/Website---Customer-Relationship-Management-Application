@@ -256,12 +256,8 @@
                                 </div><br>
                             </div>
                             <form action="" method="post" novalidate>
-                                {{ mssg_in.hidden_tag() }}
                                 <p>
-                                {{ mssg_in.message_in.label }}  {{ mssg_in.message_in(size=32) }} {{ mssg_in.submit() }}
-                                {% for error in mssg_in.message_in.errors %}
-                                <span style="color:red;">[{{ error }}]</span>
-                                {% endfor %}
+                                <input style="margin: 5px;" size="50" type="text" id="globalMsgIn" placeholder="Type..." name="globalMsgBrd"><button type="button" onclick="addGlobalMsg()">Submit</button>
                                 </p>
                             </form>
                         </div>
@@ -293,12 +289,8 @@
                                     
                             </div>
                             <form action="" method="post" novalidate>
-                                {{ note_in.hidden_tag() }}
                                 <p>
-                                {{ note_in.note_in.label }}  {{ note_in.note_in(size=32) }} {{ note_in.submit() }}
-                                {% for error in note_in.note_in.errors %}
-                                <span style="color:red;">[{{ error }}]</span>
-                                {% endfor %}
+                                <input style="margin: 5px;" size="50" type="text" id="noteIn" placeholder="Type..." name="noteInput"><button type="button" onclick="addNote()">Submit</button>
                                 </p>
                             </form>
                         </div>
@@ -322,6 +314,61 @@
 
     <!-- Light Bootstrap Table Core javascript and methods for Demo purpose -->
 	<script src="static/js/admin/light-bootstrap-dashboard.js?v=1.4.0"></script>
+
+    <script type="text/javascript">
+        function addGlobalMsg() {
+            var msg = document.getElementById('globalMsgIn').value;
+            var url = '/jmrfunding/api/global-msg';
+
+            $.ajax({
+                type: 'POST', 
+                url: url,
+                data: JSON.stringify({
+                    'msg': msg
+                }), 
+                dataType: 'json', 
+                contentType: 'application/json', 
+                success: function(data) {
+                    if (data == "Successful") {
+                        window.location.reload(true);
+                    } else {
+                        alert(data);
+                    }
+                    
+                }, 
+                error: function() {
+                    alert("Error")
+                }
+            });
+        }
+    </script>
+
+    <script type="text/javascript">
+        function addNote() {
+            var note_contents = document.getElementById('noteIn').value;
+            var url = '/jmrfunding/api/note';
+
+            $.ajax({
+                type: 'POST', 
+                url: url,
+                data: JSON.stringify({
+                    'note': note_contents
+                }), 
+                dataType: 'json', 
+                contentType: 'application/json', 
+                success: function(data) {
+                    if (data == "Successful") {
+                        window.location.reload(true);
+                    } else {
+                        alert(data);
+                    }
+                }, 
+                error: function() {
+                    alert("Error")
+                }
+            });
+        }
+    </script>
 
 	<script type="text/javascript">
         var num_of_appts = '{{ appts|tojson }}';

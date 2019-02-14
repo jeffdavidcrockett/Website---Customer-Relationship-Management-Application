@@ -77,6 +77,7 @@ def logout():
 	logout_user()
 	return redirect(url_for('login'))
 
+@csrf.exempt
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/manager', methods=['GET', 'POST'])
 @login_required
@@ -91,26 +92,60 @@ def manager():
 	appts = Appointment.query.filter_by(date=str(datetime.date.today())).all()
 	new_clients = Client.query.filter_by(signup_date=str(datetime.date.today())).all()
 	num_of_appts = len(appts)
-	mssg_in = MessageInput()
-	note_in = NoteInput()
 
-	if mssg_in.validate_on_submit():
-		mssg = Memo(author=str(current_user), 
-					body=mssg_in.message_in.data, 
-					date=str(datetime.date.today()))
-		db.session.add(mssg)
+	# if mssg_in.validate_on_submit():
+	# 	mssg = Memo(author=str(current_user), 
+	# 				body=mssg_in.message_in.data, 
+	# 				date=str(datetime.date.today()))
+	# 	db.session.add(mssg)
+	# 	db.session.commit()
+
+	# if note_in.validate_on_submit():
+	# 	note = Note(author=str(current_user), 
+	# 				body=note_in.note_in.data, 
+	# 				date=str(datetime.date.today()))
+	# 	db.session.add(note)
+	# 	db.session.commit()
+
+	return render_template('dashboard.html', mssgs=mssgs, 
+						   notes=notes, appts=num_of_appts,
+						   new_clients=new_clients, pretty_date=pretty_date)
+
+@csrf.exempt
+@app.route('/jmrfunding/api/global-msg', methods=['POST'])
+@login_required
+def add_global_msg():
+	try:
+		data = request.get_json()
+		msg_content = data['msg']
+		msg = Memo(author=str(current_user), 
+				   body=msg_content, 
+				   date=str(datetime.date.today()))
+
+		db.session.add(msg)
 		db.session.commit()
+ 
+		return jsonify("Successful")
+	except Exception as e:
+		return jsonify("Unsuccessful")
 
-	if note_in.validate_on_submit():
+@csrf.exempt
+@app.route('/jmrfunding/api/note', methods=['POST'])
+@login_required
+def add_notepad():
+	try:
+		data = request.get_json()
+		note_content = data['note']
 		note = Note(author=str(current_user), 
-					body=note_in.note_in.data, 
-					date=str(datetime.date.today()))
+				   body=note_content, 
+				   date=str(datetime.date.today()))
+
 		db.session.add(note)
 		db.session.commit()
-
-	return render_template('dashboard.html', mssg_in=mssg_in, mssgs=mssgs, 
-						   note_in=note_in, notes=notes, appts=num_of_appts,
-						   new_clients=new_clients, pretty_date=pretty_date)
+ 
+		return jsonify("Successful")
+	except Exception as e:
+		return jsonify("Unsuccessful")
 
 @csrf.exempt
 @app.route('/load_client_process', methods=['GET', 'POST'])
@@ -389,6 +424,17 @@ def view_client():
 						   interactions=interaction_results, yearsList = years, 
 						   notes=note_results, pretty_date=pretty_date)
 
+@app.route('/manual-add', methods=['GET', 'POST'])
+@login_required
+def manual_add():
+	"""
+	Marketer can manually add client
+	"""
+
+	manual_form = ClientManualAdd()
+
+	return render_template('manual-add-client.html', manual_form=manual_form, pretty_date=pretty_date)
+
 @csrf.exempt
 @app.route('/jmrfunding/api/clients/<int:client_id>', methods=['PUT'])
 @login_required
@@ -452,51 +498,43 @@ def create_client():
 	except Exception as e:
 		return jsonify("Unsuccessful")
 
-@app.route('/manual-add', methods=['GET', 'POST'])
-@login_required
-def manual_add():
-	"""
-	Marketer can manually add client
-	"""
-
-	manual_form = ClientManualAdd()
-
-	return render_template('manual-add-client.html', manual_form=manual_form, pretty_date=pretty_date)
-
 @csrf.exempt
-@app.route('/create_appt_process', methods=['GET', 'POST'])
+@app.route('/jmrfunding/api/appointments', methods=['POST'])
 @login_required
 def create_appt_process():
-	if request.method == 'POST':
-		try:
-			data = request.get_json()
-			client_id = data['clientId']
-			appt_date = data['apptDate']
-			appt_time = data['apptTime']
-			appt_notes = data['apptNotes']
-			date_obj = datetime.datetime.strptime(appt_date, '%Y-%m-%d').date()
+	"""
+	API access for creating appointments
+	"""
+	
+	try:
+		data = request.get_json()
+		client_id = data['clientId']
+		appt_date = data['apptDate']
+		appt_time = data['apptTime']
+		appt_notes = data['apptNotes']
+		date_obj = datetime.datetime.strptime(appt_date, '%Y-%m-%d').date()
 
-			client = Client.query.filter_by(id=client_id).first()
-			appointment = Appointment(client_first=client.first_name, 
-									  client_last=client.last_name, 
-									  date=date_obj, 
-									  time=appt_time, 
-									  notes=appt_notes, 
-									  creator=current_user, 
-									  client=client)
-			interaction = Interaction(client_id=client_id,
-		 							  marketer=str(current_user),
-		 							  date=date_tool.get_current_date(),
-		 							  time=date_tool.get_current_time(),
-								      type_of='Appointment Created',
-									  about=appt_notes)
-			db.session.add(appointment)
-			db.session.add(interaction)
-			db.session.commit()
+		client = Client.query.filter_by(id=client_id).first()
+		appointment = Appointment(client_first=client.first_name, 
+								  client_last=client.last_name, 
+								  date=date_obj, 
+								  time=appt_time, 
+								  notes=appt_notes, 
+								  creator=current_user, 
+								  client=client)
+		interaction = Interaction(client_id=client_id,
+		 						  marketer=str(current_user),
+		 						  date=date_tool.get_current_date(),
+		 						  time=date_tool.get_current_time(),
+								  type_of='Appointment Created',
+							      about=appt_notes)
+		db.session.add(appointment)
+		db.session.add(interaction)
+		db.session.commit()
 
-			return jsonify("Appointment successfully created")
-		except Exception as e:
-			return jsonify("Unsuccessful")
+		return jsonify("Appointment successfully created")
+	except Exception as e:
+		return jsonify("Unsuccessful")
 
 @csrf.exempt
 @app.route('/jmrfunding/api/notes/<int:client_id>', methods=['POST'])
@@ -582,42 +620,59 @@ def our_data():
 	"""
 	Displays information gathered from database. Under construction.
 	"""
-	
-	data_form = DataSelection()
 
 	marketers = Marketer.query.all()
-	clients = db.session.query(Client).filter_by(signup_date=date_tool.get_current_date())
+	curr_month = date_tool.get_current_month()
+	curr_year = date_tool.get_current_year()
 
-	num_of_clients = 0
-	for c in clients:
-		num_of_clients += 1
+	jan_start, jan_end = date_tool.get_begin_endof_month(1, curr_year)
+	jan_clients = db.session.query(Client).filter(Client.signup_date.between(jan_start, 
+												  jan_end)).count()
+	feb_start, feb_end = date_tool.get_begin_endof_month(2, curr_year)
+	feb_clients = db.session.query(Client).filter(Client.signup_date.between(feb_start, 
+												  feb_end)).count()
+	mar_start, mar_end = date_tool.get_begin_endof_month(3, curr_year)
+	mar_clients = db.session.query(Client).filter(Client.signup_date.between(mar_start, 
+												  mar_end)).count()
+	apr_start, apr_end = date_tool.get_begin_endof_month(4, curr_year)
+	apr_clients = db.session.query(Client).filter(Client.signup_date.between(apr_start, 
+												  apr_end)).count()
+	may_start, may_end = date_tool.get_begin_endof_month(5, curr_year)
+	may_clients = db.session.query(Client).filter(Client.signup_date.between(may_start, 
+												  may_end)).count()
+	jun_start, jun_end = date_tool.get_begin_endof_month(6, curr_year)
+	jun_clients = db.session.query(Client).filter(Client.signup_date.between(jun_start, 
+												  jun_end)).count()
+	jul_start, jul_end = date_tool.get_begin_endof_month(7, curr_year)
+	jul_clients = db.session.query(Client).filter(Client.signup_date.between(jul_start, 
+												  jul_end)).count()
+	aug_start, aug_end = date_tool.get_begin_endof_month(8, curr_year)
+	aug_clients = db.session.query(Client).filter(Client.signup_date.between(aug_start, 
+												  aug_end)).count()
+	sep_start, sep_end = date_tool.get_begin_endof_month(9, curr_year)
+	sep_clients = db.session.query(Client).filter(Client.signup_date.between(sep_start, 
+												  sep_end)).count()
+	oct_start, oct_end = date_tool.get_begin_endof_month(10, curr_year)
+	oct_clients = db.session.query(Client).filter(Client.signup_date.between(oct_start, 
+												  oct_end)).count()
+	nov_start, nov_end = date_tool.get_begin_endof_month(11, curr_year)
+	nov_clients = db.session.query(Client).filter(Client.signup_date.between(nov_start, 
+												  nov_end)).count()
+	dec_start, dec_end = date_tool.get_begin_endof_month(12, curr_year)
+	dec_clients = db.session.query(Client).filter(Client.signup_date.between(dec_start, 
+												  dec_end)).count()
 
-	if data_form.validate_on_submit():
-		selection = data_form.drop_menu.data
-		if selection == '2':
-			start_date, end_date = date_tool.getcurrent_beginend_ofmonth()
-			clients = db.session.query(Client).filter(Client.signup_date >= 
-													  start_date).filter(Client.signup_date <= end_date).all()
-			num_of_clients = 0
-			for c in clients:
-				num_of_clients += 1
+	month_list = [jan_clients, feb_clients, mar_clients, apr_clients, may_clients, jun_clients, 
+			      jul_clients, aug_clients, sep_clients, oct_clients, nov_clients, dec_clients]
 
-			return render_template('data.html', marketers=marketers, data_form=data_form, 
-						           num_of_clients=num_of_clients, pretty_date=pretty_date)
-		elif selection == '3':
-			# year = date_tool.get_current_year()
-			# # clients = db.session.query(distinct(func.date_part(year, Client.signup_date)))
-			# clients = Client.query.filter(Client.signup_date.ilike("%2019%")).all()
+	if curr_month < 12:
+		for i in range(curr_month, 12):
+			month_list[i] = None
 
-			# num_of_clients = 0
-			# for c in clients:
-			# 	num_of_clients += 1
-
-			# return render_template('data.html', marketers=marketers, data_form=data_form, 
-			# 			   num_of_clients=num_of_clients)
-			pass
-		else:
-			return redirect(url_for('our_data'))
-	
-	return render_template('data.html', marketers=marketers, data_form=data_form, 
-						   num_of_clients=num_of_clients, pretty_date=pretty_date)
+	return render_template('data.html', marketers=marketers, pretty_date=pretty_date, 
+						   jan_clients=month_list[0], feb_clients=month_list[1], 
+						   mar_clients=month_list[2], apr_clients=month_list[3],
+						   may_clients=month_list[4], jun_clients=month_list[5],
+						   jul_clients=month_list[6], aug_clients=month_list[7],
+						   sep_clients=month_list[8], oct_clients=month_list[9],
+						   nov_clients=month_list[10], dec_clients=month_list[11])
